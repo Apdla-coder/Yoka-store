@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yoka Store | متجر يوكا</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@200;300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Client Configuration -->
+  <script src="supabase-client.js"></script>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <span class="loader-brand">Y</span>
+      <div class="loader-bar"></div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-left">
+      <button class="nav-menu-btn" id="menuBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="shop.html">المتجر</a></li>
+        <li><a href="makeup.html">ميك أب</a></li>
+        <li><a href="fashion.html">أزياء</a></li>
+        <li><a href="collections.html">المجموعات</a></li>
+      </ul>
+    </div>
+
+    <a href="index.html" class="nav-logo">
+      <span class="logo-y">Y</span>oka
+    </a>
+
+    <div class="nav-right">
+      <button class="nav-icon" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
+      <button class="nav-icon" aria-label="Wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <a href="cart.html" class="nav-icon cart-icon" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-inner">
+      <button class="mobile-menu-close" id="menuClose">✕</button>
+      <nav class="mobile-nav">
+        <a href="shop.html" class="mobile-nav-link">المتجر</a>
+        <a href="makeup.html" class="mobile-nav-link">ميك أب</a>
+        <a href="fashion.html" class="mobile-nav-link">أزياء</a>
+        <a href="collections.html" class="mobile-nav-link">المجموعات</a>
+        <a href="about.html" class="mobile-nav-link">من نحن</a>
+        <a href="contact.html" class="mobile-nav-link">تواصلي معنا</a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <p>@yokastore</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-gradient"></div>
+      <div class="hero-pattern"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-tag" data-reveal>New Collection 2025</div>
+      <h1 class="hero-title" data-reveal>
+        <span class="hero-title-line">أنوثة</span>
+        <span class="hero-title-line italic">لا حدود</span>
+        <span class="hero-title-line">لها</span>
+      </h1>
+      <p class="hero-subtitle" data-reveal>
+        اكتشفي عالماً من الجمال والأناقة مع Yoka Store —<br/>
+        أزياء راقية وميك أب فاخر لكل امرأة
+      </p>
+      <div class="hero-actions" data-reveal>
+        <a href="shop.html" class="btn-primary">تسوقي الآن</a>
+        <a href="collections.html" class="btn-outline">استكشفي المجموعات</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-image-frame">
+        <div class="hero-image-bg"></div>
+        <div class="hero-floating-card card-1">
+          <span class="card-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Star" style="width:16px;height:16px;"></span>
+          <span>Best Seller</span>
+        </div>
+        <div class="hero-floating-card card-2">
+          <span>Lip Kit</span>
+          <span class="card-price">٢٩٠ ر.س</span>
+        </div>
+        <div class="hero-shape s1"></div>
+        <div class="hero-shape s2"></div>
+        <div class="hero-shape s3"></div>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>مرري للأسفل</span>
+      <div class="scroll-line"></div>
+    </div>
+
+    <div class="hero-marquee">
+      <div class="marquee-track">
+        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · </span>
+        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · </span>
+        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories section">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <span class="section-tag">تصفحي بالفئة</span>
+        <h2 class="section-title">اختاري<em> عالمك</em></h2>
+      </div>
+
+      <div class="categories-grid" id="categoriesGrid">
+        <div class="cat-card cat-makeup" data-reveal data-category-slug="makeup">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3557/3557605.png" alt="Makeup" style="width:40px;"></div>
+            <h3>ميك أب</h3>
+            <p>أحمر شفاه · بودرة · عيون · بشرة</p>
+            <a href="makeup.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+
+        <div class="cat-card cat-fashion" data-reveal data-category-slug="fashion">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3159/3159620.png" alt="Fashion" style="width:40px;"></div>
+            <h3>أزياء</h3>
+            <p>فساتين · عبايات · إكسسوارات</p>
+            <a href="fashion.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+
+        <div class="cat-card cat-skincare" data-reveal data-category-slug="skincare">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1764/1764708.png" alt="Skincare" style="width:40px;"></div>
+            <h3>العناية بالبشرة</h3>
+            <p>سيروم · مرطب · كريم · ماسك</p>
+            <a href="skincare.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+
+        <div class="cat-card cat-accessories" data-reveal data-category-slug="accessories">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1251/1251415.png" alt="Accessories" style="width:40px;"></div>
+            <h3>إكسسوارات</h3>
+            <p>حقائب · مجوهرات · نظارات</p>
+            <a href="accessories.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Collection -->
+  <section class="featured section">
+    <div class="container">
+      <div class="section-header centered" data-reveal>
+        <span class="section-tag">الأكثر مبيعاً</span>
+        <h2 class="section-title">منتجات <em>مميزة</em></h2>
+      </div>
+
+      <div class="products-filter" data-reveal>
+        <button class="filter-btn active" data-filter="all">الكل</button>
+        <button class="filter-btn" data-filter="makeup">ميك أب</button>
+        <button class="filter-btn" data-filter="fashion">أزياء</button>
+        <button class="filter-btn" data-filter="skincare">بشرة</button>
+        <button class="filter-btn" data-filter="new">جديد</button>
+      </div>
+
+      <div class="products-grid" id="productsGrid">
+        <!-- Product Cards injected by JS -->
+      </div>
+
+      <div class="view-all-wrap" data-reveal>
+        <a href="shop.html" class="btn-primary">عرض كل المنتجات</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Campaign Banner -->
+  <section class="campaign section">
+    <div class="campaign-inner">
+      <div class="campaign-text" data-reveal>
+        <span class="section-tag light">مجموعة الصيف ٢٠٢٥</span>
+        <h2 class="campaign-title">
+          صيف من<br/><em>الألوان</em>
+        </h2>
+        <p>أحمر شفاه جرئ · ظلال عيون نابضة · فساتين الصيف المميزة</p>
+        <a href="collections.html" class="btn-light">اكتشفي الآن</a>
+      </div>
+      <div class="campaign-shapes">
+        <div class="cs cs1"></div>
+        <div class="cs cs2"></div>
+        <div class="cs cs3"></div>
+        <div class="cs cs4"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials section">
+    <div class="container">
+      <div class="section-header centered" data-reveal>
+        <span class="section-tag">آراء عملاؤنا</span>
+        <h2 class="section-title">هن <em>تحبوننا</em></h2>
+      </div>
+
+      <div class="testimonials-track" id="testimonialsTrack">
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"من أجمل المتاجر اللي تعاملت معها! الجودة فوق التوقعات والشحن سريع جداً"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#f4b8c1"></div>
+            <span>سارة محمد</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"أحمر الشفاه من Yoka يدوم طول اليوم! ما عدت أجرب غيره"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#c8b4e3"></div>
+            <span>نورا الأحمدي</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"الفستان وصل وأنا ما توقعت يكون بهالجودة. الخامة راقية جداً"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#b4d8e3"></div>
+            <span>ليلى العمر</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"التغليف فخم جداً، حاسة إن كل طلب هدية! شكراً Yoka على الاهتمام"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#e3c8b4"></div>
+            <span>رنا خالد</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonials-dots" id="tDots"></div>
+    </div>
+  </section>
+
+  <!-- Instagram / Social -->
+  <section class="social section">
+    <div class="container">
+      <div class="section-header centered" data-reveal>
+        <span class="section-tag">تابعينا</span>
+        <h2 class="section-title">@yokastore <em>على انستقرام</em></h2>
+      </div>
+      <div class="social-grid" data-reveal>
+        <div class="social-item si1"><div class="si-overlay"><span>♡ 2.4k</span></div></div>
+        <div class="social-item si2"><div class="si-overlay"><span>♡ 1.8k</span></div></div>
+        <div class="social-item si3"><div class="si-overlay"><span>♡ 3.1k</span></div></div>
+        <div class="social-item si4"><div class="si-overlay"><span>♡ 980</span></div></div>
+        <div class="social-item si5"><div class="si-overlay"><span>♡ 2.2k</span></div></div>
+        <div class="social-item si6"><div class="si-overlay"><span>♡ 4.5k</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="newsletter section">
+    <div class="container">
+      <div class="newsletter-inner" data-reveal>
+        <div class="nl-deco nl-deco-1">✦</div>
+        <div class="nl-deco nl-deco-2">✦</div>
+        <span class="section-tag">النشرة البريدية</span>
+        <h2 class="newsletter-title">كوني أول من تعرف<br/><em>عن عروضنا</em></h2>
+        <p>اشتركي واحصلي على خصم ١٥٪ على أول طلب</p>
+        <form class="nl-form" onsubmit="handleNewsletter(event)">
+          <input type="email" placeholder="بريدك الإلكتروني" class="nl-input" required />
+          <button type="submit" class="nl-btn">اشتركي</button>
+        </form>
+        <p class="nl-note">لا رسائل مزعجة. يمكنك إلغاء الاشتراك في أي وقت.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span class="logo-y">Y</span>oka
+          </a>
+          <p>متجرك المفضل للجمال والأزياء الراقية.<br/>جودة لا تُقبل بأقل منها.</p>
+          <div class="footer-socials">
+            <a href="#" class="social-link">Instagram</a>
+            <a href="#" class="social-link">TikTok</a>
+            <a href="#" class="social-link">Snapchat</a>
+          </div>
+        </div>
+
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>التسوق</h4>
+            <ul>
+              <li><a href="makeup.html">ميك أب</a></li>
+              <li><a href="fashion.html">أزياء</a></li>
+              <li><a href="skincare.html">العناية بالبشرة</a></li>
+              <li><a href="accessories.html">إكسسوارات</a></li>
+              <li><a href="sale.html">تخفيضات</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>خدمة العملاء</h4>
+            <ul>
+              <li><a href="shipping.html">الشحن والتوصيل</a></li>
+              <li><a href="returns.html">الإرجاع والاستبدال</a></li>
+              <li><a href="#">تتبع الطلب</a></li>
+              <li><a href="contact.html">تواصلي معنا</a></li>
+              <li><a href="#">الأسئلة الشائعة</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>يوكا</h4>
+            <ul>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="#">مدونتنا</a></li>
+              <li><a href="#">برنامج الولاء</a></li>
+              <li><a href="#">سياسة الخصوصية</a></li>
+              <li><a href="#">الشروط والأحكام</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© ٢٠٢٥ Yoka Store. جميع الحقوق محفوظة.</p>
+        <div class="footer-payments">
+          <span>Visa</span>
+          <span>Mastercard</span>
+          <span>Mada</span>
+          <span>Apple Pay</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Quick View Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="quickViewModal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <!-- Cart Manager must be loaded after main script -->
+  <script src="cart-manager.js"></script>
+</body>
+</html>

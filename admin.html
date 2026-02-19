@@ -1,0 +1,2625 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Yoka Admin — لوحة التحكم</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Tajawal:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<style>
+/* ════════════════════════════════════════════
+   YOKA ADMIN DASHBOARD
+   Aesthetic: Dark Luxury · Obsidian & Rose Gold
+════════════════════════════════════════════ */
+:root {
+  --bg:       #0a0809;
+  --bg2:      #120f10;
+  --bg3:      #1c1618;
+  --bg4:      #261e20;
+  --surface:  #1e181a;
+  --surface2: #2a2023;
+  --border:   rgba(255,255,255,.07);
+  --border2:  rgba(255,255,255,.12);
+
+  --rose:     #c9897a;
+  --rose2:    #e8b4a8;
+  --rose3:    #f5d5ce;
+  --rose-glow:rgba(201,137,122,.18);
+
+  --gold:     #c9a86c;
+  --gold2:    #e8d4a8;
+  --gold-glow:rgba(201,168,108,.12);
+
+  --green:    #6cbf8a;
+  --red:      #e07070;
+  --blue:     #7aaee8;
+  --purple:   #b07ae8;
+
+  --text:     #f0e8e4;
+  --text2:    #b8a8a4;
+  --text3:    #7a6860;
+
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Tajawal', sans-serif;
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+
+  --shadow: 0 4px 24px rgba(0,0,0,.4);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,.5);
+  --glow: 0 0 40px var(--rose-glow);
+
+  --ease: .3s cubic-bezier(.4,0,.2,1);
+  --spring: .45s cubic-bezier(.34,1.56,.64,1);
+
+  --sidebar-w: 260px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+}
+a { text-decoration:none; color:inherit; }
+button { border:none; background:none; font-family:var(--font-b); cursor:pointer; }
+input, select, textarea {
+  font-family: var(--font-b);
+  color: var(--text);
+  background: var(--bg3);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: .65rem 1rem;
+  outline: none;
+  transition: border-color var(--ease), box-shadow var(--ease);
+  width: 100%;
+  font-size: .88rem;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-glow);
+}
+select option { background: var(--bg3); }
+
+/* ── Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rose); }
+
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; right: 0;
+  z-index: 100;
+  transition: transform var(--ease);
+}
+
+.sidebar-logo {
+  padding: 2rem 1.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--rose), var(--gold));
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-d);
+  font-size: 1.4rem;
+  font-style: italic;
+  color: white;
+  box-shadow: 0 4px 16px var(--rose-glow);
+  flex-shrink: 0;
+}
+.logo-text { line-height: 1.2; }
+.logo-text strong {
+  display: block;
+  font-family: var(--font-d);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.logo-text span { font-size: .7rem; color: var(--text3); letter-spacing: .12em; text-transform: uppercase; }
+
+.sidebar-nav { flex: 1; padding: 1.25rem 0; overflow-y: auto; }
+
+.nav-section-label {
+  padding: .9rem 1.75rem .4rem;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .75rem 1.75rem;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--text2);
+  border-right: 3px solid transparent;
+  transition: all var(--ease);
+  cursor: pointer;
+  position: relative;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+.nav-item.active {
+  color: var(--rose2);
+  background: var(--rose-glow);
+  border-right-color: var(--rose);
+}
+.nav-item .nav-icon {
+  width: 18px; height: 18px;
+  opacity: .7;
+  flex-shrink: 0;
+  transition: opacity var(--ease);
+}
+.nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
+.nav-badge {
+  margin-right: auto;
+  background: var(--rose);
+  color: white;
+  font-size: .65rem;
+  font-weight: 700;
+  padding: .15rem .5rem;
+  border-radius: 99px;
+  min-width: 20px;
+  text-align: center;
+}
+.nav-badge.green { background: var(--green); }
+.nav-badge.gold { background: var(--gold); color: var(--bg); }
+
+.sidebar-footer {
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid var(--border);
+}
+.admin-card {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+}
+.admin-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose), var(--purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.admin-info { flex: 1; overflow: hidden; }
+.admin-info strong { display: block; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-info span { font-size: .72rem; color: var(--text3); }
+.admin-more { color: var(--text3); font-size: .9rem; transition: color var(--ease); }
+.admin-more:hover { color: var(--rose); }
+
+/* ══════════════════════════════════════════
+   MAIN LAYOUT
+══════════════════════════════════════════ */
+.main {
+  margin-right: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Topbar ─────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10,8,9,.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.topbar-title { font-family: var(--font-d); font-size: 1.5rem; font-weight: 300; }
+.topbar-title em { font-style: italic; color: var(--rose); }
+
+.topbar-search {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  padding: .55rem 1.25rem;
+  flex: 1;
+  max-width: 400px;
+}
+.topbar-search input {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: .85rem;
+  color: var(--text2);
+  flex: 1;
+}
+.topbar-search input::placeholder { color: var(--text3); }
+.topbar-search svg { color: var(--text3); flex-shrink: 0; }
+
+.topbar-actions { display: flex; align-items: center; gap: .75rem; }
+.topbar-btn {
+  position: relative;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  transition: all var(--ease);
+}
+.topbar-btn:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-glow); }
+.topbar-notif {
+  position: absolute;
+  top: -2px; left: -2px;
+  width: 10px; height: 10px;
+  background: var(--rose);
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+}
+.topbar-store-link {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem 1.25rem;
+  background: linear-gradient(135deg, var(--rose), var(--gold));
+  border-radius: var(--r-lg);
+  font-size: .82rem;
+  font-weight: 600;
+  color: white;
+  transition: opacity var(--ease), transform var(--spring);
+}
+.topbar-store-link:hover { opacity: .88; transform: translateY(-1px); }
+
+/* ── Page Content ───────────────────────── */
+.page-content { padding: 2.5rem; flex: 1; }
+.page-content.hidden { display: none; }
+
+/* ══════════════════════════════════════════
+   COMMON COMPONENTS
+══════════════════════════════════════════ */
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.75rem;
+  transition: border-color var(--ease);
+}
+.card:hover { border-color: var(--border2); }
+.card-title {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title a, .card-title button {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--rose);
+  letter-spacing: .08em;
+  text-transform: none;
+  transition: opacity var(--ease);
+}
+.card-title a:hover, .card-title button:hover { opacity: .7; }
+
+/* Stat Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--spring), border-color var(--ease), box-shadow var(--ease);
+}
+.stat-card:hover { transform: translateY(-4px); border-color: var(--border2); box-shadow: var(--shadow); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; left: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  opacity: .08;
+  pointer-events: none;
+}
+.stat-card.rose::before  { background: var(--rose); }
+.stat-card.gold::before  { background: var(--gold); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.blue::before  { background: var(--blue); }
+
+.stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.stat-icon.rose  { background: var(--rose-glow); }
+.stat-icon.gold  { background: var(--gold-glow); }
+.stat-icon.green { background: rgba(108,191,138,.12); }
+.stat-icon.blue  { background: rgba(122,174,232,.12); }
+
+.stat-change {
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .2rem .55rem;
+  border-radius: 99px;
+}
+.stat-change.up { background: rgba(108,191,138,.15); color: var(--green); }
+.stat-change.down { background: rgba(224,112,112,.15); color: var(--red); }
+
+.stat-value {
+  font-family: var(--font-d);
+  font-size: 2.2rem;
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: .35rem;
+}
+.stat-label { font-size: .78rem; color: var(--text3); }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+thead th {
+  text-align: right;
+  padding: .75rem 1rem;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background var(--ease);
+}
+tbody tr:hover { background: rgba(255,255,255,.025); }
+tbody tr:last-child { border-bottom: none; }
+tbody td {
+  padding: 1rem 1rem;
+  color: var(--text2);
+  vertical-align: middle;
+}
+tbody td:first-child { color: var(--text); }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .25rem .75rem;
+  border-radius: 99px;
+  font-size: .7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge-success { background: rgba(108,191,138,.15); color: var(--green); }
+.badge-warning { background: rgba(201,168,108,.15); color: var(--gold); }
+.badge-danger  { background: rgba(224,112,112,.15);  color: var(--red); }
+.badge-info    { background: rgba(122,174,232,.15);  color: var(--blue); }
+.badge-purple  { background: rgba(176,122,232,.15);  color: var(--purple); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .7rem 1.5rem;
+  border-radius: var(--r-lg);
+  font-size: .85rem;
+  font-weight: 600;
+  font-family: var(--font-b);
+  transition: all var(--spring);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-rose { background: linear-gradient(135deg, var(--rose), #d4a090); color: white; }
+.btn-rose:hover { opacity: .88; transform: translateY(-2px); box-shadow: 0 8px 24px var(--rose-glow); }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-glow); }
+.btn-danger { background: rgba(224,112,112,.15); border: 1px solid rgba(224,112,112,.3); color: var(--red); }
+.btn-danger:hover { background: rgba(224,112,112,.25); }
+.btn-sm { padding: .45rem 1rem; font-size: .78rem; }
+.btn-icon { padding: .55rem; border-radius: var(--r-sm); }
+
+/* Page Header */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+  gap: 1rem;
+}
+.page-header-left h1 {
+  font-family: var(--font-d);
+  font-size: 2rem;
+  font-weight: 300;
+}
+.page-header-left h1 em { font-style: italic; color: var(--rose); }
+.page-header-left p { font-size: .85rem; color: var(--text3); margin-top: .3rem; }
+.page-header-actions { display: flex; gap: .75rem; flex-shrink: 0; }
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+.grid-7-3 { display: grid; grid-template-columns: 7fr 3fr; gap: 1.25rem; }
+.grid-6-4 { display: grid; grid-template-columns: 6fr 4fr; gap: 1.25rem; }
+
+/* ══════════════════════════════════════════
+   CHART (Pure CSS)
+══════════════════════════════════════════ */
+.chart-bar-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: .75rem;
+  height: 180px;
+}
+.chart-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  height: 100%;
+  justify-content: flex-end;
+}
+.chart-bar {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  transition: height .8s cubic-bezier(.34,1.1,.64,1);
+  position: relative;
+  min-height: 4px;
+}
+.chart-bar.rose  { background: linear-gradient(to top, var(--rose), var(--rose2)); }
+.chart-bar.gold  { background: linear-gradient(to top, var(--gold), var(--gold2)); }
+.chart-bar:hover::after {
+  content: attr(data-val);
+  position: absolute;
+  top: -28px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: .2rem .55rem;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  z-index: 10;
+}
+.chart-label { font-size: .68rem; color: var(--text3); text-align: center; }
+
+.mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+.mini-bar {
+  width: 6px;
+  border-radius: 3px 3px 0 0;
+  background: var(--rose);
+  opacity: .5;
+  transition: opacity var(--ease);
+}
+.mini-bar:last-child { opacity: 1; }
+
+/* ══════════════════════════════════════════
+   DONUT CHART (CSS)
+══════════════════════════════════════════ */
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.donut {
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--rose) 0% 45%,
+    var(--gold) 45% 72%,
+    var(--green) 72% 88%,
+    var(--blue) 88% 100%
+  );
+  position: relative;
+  flex-shrink: 0;
+}
+.donut::after {
+  content: '';
+  position: absolute;
+  inset: 28px;
+  background: var(--surface);
+  border-radius: 50%;
+}
+.donut-labels { display: flex; flex-direction: column; gap: .6rem; }
+.donut-label {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  font-size: .82rem;
+}
+.donut-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════
+   FORM STYLES
+══════════════════════════════════════════ */
+.form-group { margin-bottom: 1.25rem; }
+.form-label {
+  display: block;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: .5rem;
+  letter-spacing: .04em;
+}
+.form-hint { font-size: .72rem; color: var(--text3); margin-top: .35rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--r-md);
+  padding: 2.5rem;
+  text-align: center;
+  transition: border-color var(--ease), background var(--ease);
+  cursor: pointer;
+}
+.upload-zone:hover { border-color: var(--rose); background: var(--rose-glow); }
+.upload-icon { font-size: 2rem; margin-bottom: .75rem; }
+.upload-text { font-size: .85rem; color: var(--text2); }
+.upload-text strong { color: var(--rose); }
+.upload-sub { font-size: .75rem; color: var(--text3); margin-top: .35rem; }
+
+.color-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.color-input-wrap input[type="color"] {
+  width: 40px; height: 40px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px; height: 24px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg4);
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background var(--ease);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; top: 3px;
+  background: var(--text3);
+  border-radius: 50%;
+  transition: transform var(--ease), background var(--ease);
+}
+.toggle input:checked + .toggle-slider { background: var(--rose); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-row-info strong { display: block; font-size: .88rem; margin-bottom: .2rem; }
+.toggle-row-info span { font-size: .78rem; color: var(--text3); }
+
+/* ══════════════════════════════════════════
+   PRODUCT IMAGE GRID (in product add)
+══════════════════════════════════════════ */
+.img-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .75rem;
+  margin-top: 1rem;
+}
+.img-preview {
+  aspect-ratio: 1;
+  background: var(--bg3);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.img-preview-remove {
+  position: absolute;
+  top: 4px; left: 4px;
+  background: var(--red);
+  color: white;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: .6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--ease);
+}
+.img-preview:hover .img-preview-remove { opacity: 1; }
+
+/* ══════════════════════════════════════════
+   NOTIFICATION PANEL
+══════════════════════════════════════════ */
+.notif-panel {
+  position: fixed;
+  top: 0; left: 0;
+  width: 380px;
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  z-index: 200;
+  transform: translateX(-100%);
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+}
+.notif-panel.open { transform: translateX(0); }
+.notif-header {
+  padding: 1.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.notif-header h3 { font-family: var(--font-d); font-size: 1.25rem; font-weight: 400; }
+.notif-close { color: var(--text3); font-size: 1.1rem; transition: color var(--ease); }
+.notif-close:hover { color: var(--rose); }
+.notif-list { flex: 1; overflow-y: auto; padding: 1rem 0; }
+.notif-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--ease);
+  cursor: pointer;
+}
+.notif-item:hover { background: rgba(255,255,255,.025); }
+.notif-item.unread { border-right: 3px solid var(--rose); }
+.notif-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.notif-content strong { display: block; font-size: .85rem; margin-bottom: .2rem; }
+.notif-content span { font-size: .78rem; color: var(--text3); }
+.notif-time { font-size: .7rem; color: var(--text3); margin-top: .35rem; }
+.notif-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 190;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--ease);
+}
+.notif-overlay.open { opacity: 1; visibility: visible; }
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--ease);
+  backdrop-filter: blur(8px);
+}
+.modal-bg.open { opacity: 1; visibility: visible; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-xl);
+  padding: 2.5rem;
+  max-width: 520px;
+  width: 90%;
+  transform: scale(.92) translateY(20px);
+  transition: transform .4s var(--spring);
+  position: relative;
+}
+.modal-bg.open .modal-box { transform: scale(1) translateY(0); }
+.modal-title {
+  font-family: var(--font-d);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+.modal-title em { font-style: italic; color: var(--rose); }
+.modal-actions { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 2rem; }
+.modal-close-x {
+  position: absolute;
+  top: 1.25rem; left: 1.25rem;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: .9rem;
+  transition: all var(--ease);
+}
+.modal-close-x:hover { background: var(--red); color: white; }
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast-stack {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: 1rem 1.5rem;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  font-size: .88rem;
+  min-width: 280px;
+  animation: toastIn .4s var(--spring) forwards;
+  border-right: 3px solid var(--rose);
+}
+.toast.success { border-right-color: var(--green); }
+.toast.error   { border-right-color: var(--red); }
+.toast.warning { border-right-color: var(--gold); }
+@keyframes toastIn {
+  from { transform: translateX(-120%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastOut {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-120%); opacity: 0; }
+}
+
+/* ══════════════════════════════════════════
+   DASHBOARD PAGE
+══════════════════════════════════════════ */
+.activity-list { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.activity-content { flex: 1; }
+.activity-content strong { font-size: .88rem; display: block; }
+.activity-content span { font-size: .78rem; color: var(--text3); }
+.activity-time { font-size: .72rem; color: var(--text3); white-space: nowrap; }
+
+.top-products { display: flex; flex-direction: column; gap: .75rem; }
+.top-prod {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.top-prod:last-child { border-bottom: none; }
+.top-prod-num {
+  font-family: var(--font-d);
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--text3);
+  width: 24px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.top-prod-emoji { font-size: 1.5rem; flex-shrink: 0; }
+.top-prod-info { flex: 1; }
+.top-prod-info strong { display: block; font-size: .88rem; }
+.top-prod-info span { font-size: .75rem; color: var(--text3); }
+.top-prod-price { font-size: .9rem; font-weight: 700; color: var(--rose2); }
+
+/* ══════════════════════════════════════════
+   ORDERS PAGE
+══════════════════════════════════════════ */
+.orders-filter-bar {
+  display: flex;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.order-filter-tab {
+  padding: .5rem 1.25rem;
+  border-radius: 99px;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: all var(--ease);
+  cursor: pointer;
+}
+.order-filter-tab:hover { color: var(--text2); }
+.order-filter-tab.active {
+  background: var(--rose-glow);
+  border-color: var(--rose);
+  color: var(--rose2);
+}
+
+/* ══════════════════════════════════════════
+   SETTINGS PAGE
+══════════════════════════════════════════ */
+.settings-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+.settings-tab {
+  padding: .85rem 1.5rem;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all var(--ease);
+  cursor: pointer;
+}
+.settings-tab:hover { color: var(--text2); }
+.settings-tab.active { color: var(--rose2); border-bottom-color: var(--rose); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-7-3 { grid-template-columns: 1fr; }
+  .grid-6-4 { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(100%); }
+  .sidebar.mobile-open { transform: translateX(0); --sidebar-w: 260px; }
+  .main { margin-right: 0; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .page-content { padding: 1.5rem; }
+  .topbar { padding: 1rem 1.5rem; }
+  .topbar-search { display: none; }
+}
+
+/* ══════════════════════════════════════════
+   SKELETON LOADER
+══════════════════════════════════════════ */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-sm);
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ══════════════════════════════════════════
+   AVATAR COLORS
+══════════════════════════════════════════ */
+.av-1 { background: linear-gradient(135deg,#f4b8c1,#e8607a); }
+.av-2 { background: linear-gradient(135deg,#c8b4e3,#9b59b6); }
+.av-3 { background: linear-gradient(135deg,#b4d8e3,#3498db); }
+.av-4 { background: linear-gradient(135deg,#e3c8b4,#e67e22); }
+.av-5 { background: linear-gradient(135deg,#b4e3c8,#27ae60); }
+
+/* Login */
+.login-wrap {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-xl);
+  padding: 3rem;
+  width: 400px;
+  max-width: 95vw;
+  animation: loginIn .6s var(--spring) forwards;
+}
+@keyframes loginIn {
+  from { opacity:0; transform: translateY(30px) scale(.96); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.login-logo .logo-icon { width: 60px; height: 60px; font-size: 2rem; margin: 0 auto 1rem; }
+.login-logo h1 { font-family: var(--font-d); font-size: 1.75rem; font-weight: 300; }
+.login-logo p { font-size: .82rem; color: var(--text3); margin-top: .3rem; }
+.login-error {
+  background: rgba(224,112,112,.1);
+  border: 1px solid rgba(224,112,112,.3);
+  border-radius: var(--r-sm);
+  padding: .75rem 1rem;
+  font-size: .82rem;
+  color: var(--red);
+  margin-bottom: 1rem;
+  display: none;
+}
+.login-error.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">Y</div>
+      <h1><em>Yoka</em> Admin</h1>
+      <p>لوحة التحكم الإدارية</p>
+    </div>
+    <div class="login-error" id="loginError">بيانات الدخول غير صحيحة. حاول مرة أخرى.</div>
+    <div class="form-group">
+      <label class="form-label">البريد الإلكتروني</label>
+      <input type="email" id="loginEmail" placeholder="admin@yokastore.com" value="admin@yokastore.com"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">كلمة المرور</label>
+      <input type="password" id="loginPass" placeholder="••••••••" value="admin123"/>
+    </div>
+    <button class="btn btn-rose" style="width:100%;justify-content:center;margin-top:.5rem" onclick="doLogin()">
+      دخول إلى لوحة التحكم ←
+    </button>
+    <p style="text-align:center;font-size:.75rem;color:var(--text3);margin-top:1rem">
+      بريد: admin@yokastore.com / كلمة المرور: admin123
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">Y</div>
+    <div class="logo-text">
+      <strong>Yoka Store</strong>
+      <span>Admin Panel</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">الرئيسية</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      الرئيسية
+    </div>
+    <div class="nav-item" onclick="navigate('analytics')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      التحليلات
+    </div>
+
+    <div class="nav-section-label">المتجر</div>
+    <div class="nav-item" onclick="navigate('orders')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      الطلبات
+      <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-item" onclick="navigate('products')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      المنتجات
+    </div>
+    <div class="nav-item" onclick="navigate('add-product')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      إضافة منتج
+    </div>
+    <div class="nav-item" onclick="navigate('categories')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      التصنيفات
+    </div>
+
+    <div class="nav-section-label">العملاء</div>
+    <div class="nav-item" onclick="navigate('customers')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      العملاء
+    </div>
+    <div class="nav-item" onclick="navigate('reviews')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      التقييمات
+      <span class="nav-badge green">3</span>
+    </div>
+
+    <div class="nav-section-label">التسويق</div>
+    <div class="nav-item" onclick="navigate('coupons')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      الكوبونات
+    </div>
+    <div class="nav-item" onclick="navigate('banners')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      البانرات
+      <span class="nav-badge gold">!</span>
+    </div>
+
+    <div class="nav-section-label">النظام</div>
+    <div class="nav-item" onclick="navigate('settings')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      الإعدادات
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-card">
+      <div class="admin-avatar">A</div>
+      <div class="admin-info">
+        <strong>Admin Yoka</strong>
+        <span>مدير النظام</span>
+      </div>
+      <button class="admin-more" onclick="doLogout()" title="تسجيل الخروج">⏻</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════
+     NOTIFICATION PANEL
+══════════════════════════════════════ -->
+<div class="notif-overlay" id="notifOverlay" onclick="closeNotif()"></div>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <h3>الإشعارات</h3>
+    <button class="notif-close" onclick="closeNotif()">✕</button>
+  </div>
+  <div class="notif-list">
+    <div class="notif-item unread">
+      <div class="notif-avatar av-1">🛍️</div>
+      <div class="notif-content">
+        <strong>طلب جديد #٢٠٤٧</strong>
+        <span>سارة محمد · Velvet Rose Lip Kit × ٢</span>
+        <div class="notif-time">منذ ٥ دقائق</div>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-avatar av-2">⭐</div>
+      <div class="notif-content">
+        <strong>تقييم جديد</strong>
+        <span>نورا خالد أضافت ٥ نجوم على Midnight Palazzo</span>
+        <div class="notif-time">منذ ١٨ دقيقة</div>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-avatar" style="background:rgba(224,112,112,.2);font-size:1.1rem">⚠️</div>
+      <div class="notif-content">
+        <strong>مخزون منخفض</strong>
+        <span>Glow Serum 30ml · باقي ٣ قطع فقط</span>
+        <div class="notif-time">منذ ٤٢ دقيقة</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-avatar av-3">💳</div>
+      <div class="notif-content">
+        <strong>دفع ناجح #٢٠٤٦</strong>
+        <span>ليلى العمر · ٨٩٠ ر.س</span>
+        <div class="notif-time">منذ ساعة</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-avatar av-4">🚚</div>
+      <div class="notif-content">
+        <strong>طلب تم شحنه #٢٠٤٢</strong>
+        <span>رنا سعيد · قيد التوصيل</span>
+        <div class="notif-time">منذ ساعتين</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-avatar av-5">👤</div>
+      <div class="notif-content">
+        <strong>عضو جديد</strong>
+        <span>منى الأحمدي سجّلت حساباً جديداً</span>
+        <div class="notif-time">منذ ٣ ساعات</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DELETE MODAL
+══════════════════════════════════════ -->
+<div class="modal-bg" id="deleteModal">
+  <div class="modal-box">
+    <button class="modal-close-x" onclick="closeDeleteModal()">✕</button>
+    <div class="modal-title">حذف <em id="deleteTarget">المنتج</em>؟</div>
+    <p style="color:var(--text3);font-size:.9rem;line-height:1.7">هذا الإجراء لا يمكن التراجع عنه. سيتم حذف البيانات بشكل دائم.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">إلغاء</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">نعم، احذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TOAST STACK
+══════════════════════════════════════ -->
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ══════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <button style="display:none;color:var(--text2)" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+      <h1 class="topbar-title" id="topbarTitle">لوحة <em>التحكم</em></h1>
+    </div>
+    <div class="topbar-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="ابحث عن منتج، طلب، عميل..." />
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn" onclick="openNotif()" title="الإشعارات">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="topbar-notif"></span>
+      </button>
+      <button class="topbar-btn" title="الإعدادات" onclick="navigate('settings')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <a href="index.html" class="topbar-store-link" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        عرض المتجر
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════ PAGE: DASHBOARD ══════════════════ -->
+  <div class="page-content" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>مرحباً، <em>Admin</em> 👋</h1>
+        <p>اليوم الأربعاء، ١٨ فبراير ٢٠٢٦ — إليكِ ملخص المتجر</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="toast('تم تحديث البيانات','success')">↻ تحديث</button>
+        <button class="btn btn-rose btn-sm" onclick="navigate('add-product')">+ منتج جديد</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card rose">
+        <div class="stat-top">
+          <div class="stat-icon rose">💰</div>
+          <span class="stat-change up">↑ ١٢٪</span>
+        </div>
+        <div class="stat-value">٤٨٬٢٣٠</div>
+        <div class="stat-label">إجمالي المبيعات (ر.س)</div>
+        <div class="mini-chart" style="margin-top:.75rem">
+          <div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:60%"></div>
+          <div class="mini-bar" style="height:45%"></div><div class="mini-bar" style="height:70%"></div>
+          <div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:85%"></div>
+          <div class="mini-bar" style="height:100%"></div>
+        </div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-top">
+          <div class="stat-icon gold">🛍️</div>
+          <span class="stat-change up">↑ ٨٪</span>
+        </div>
+        <div class="stat-value">٢٣٧</div>
+        <div class="stat-label">الطلبات هذا الشهر</div>
+        <div class="mini-chart" style="margin-top:.75rem">
+          <div class="mini-bar" style="height:55%;background:var(--gold)"></div>
+          <div class="mini-bar" style="height:70%;background:var(--gold)"></div>
+          <div class="mini-bar" style="height:40%;background:var(--gold)"></div>
+          <div class="mini-bar" style="height:80%;background:var(--gold)"></div>
+          <div class="mini-bar" style="height:65%;background:var(--gold)"></div>
+          <div class="mini-bar" style="height:90%;background:var(--gold)"></div>
+          <div class="mini-bar" style="height:100%;background:var(--gold)"></div>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div class="stat-icon green">👥</div>
+          <span class="stat-change up">↑ ٢٤٪</span>
+        </div>
+        <div class="stat-value">١٬٤٨٢</div>
+        <div class="stat-label">إجمالي العملاء</div>
+        <div class="mini-chart" style="margin-top:.75rem">
+          <div class="mini-bar" style="height:35%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:50%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:60%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:55%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:75%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:85%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:100%;background:var(--green)"></div>
+        </div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-top">
+          <div class="stat-icon blue">📦</div>
+          <span class="stat-change down">↓ ٣٪</span>
+        </div>
+        <div class="stat-value">٥٣٧</div>
+        <div class="stat-label">المنتجات النشطة</div>
+        <div class="mini-chart" style="margin-top:.75rem">
+          <div class="mini-bar" style="height:80%;background:var(--blue)"></div>
+          <div class="mini-bar" style="height:100%;background:var(--blue)"></div>
+          <div class="mini-bar" style="height:90%;background:var(--blue)"></div>
+          <div class="mini-bar" style="height:85%;background:var(--blue)"></div>
+          <div class="mini-bar" style="height:95%;background:var(--blue)"></div>
+          <div class="mini-bar" style="height:88%;background:var(--blue)"></div>
+          <div class="mini-bar" style="height:92%;background:var(--blue)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid-7-3" style="margin-bottom:1.25rem">
+      <div class="card">
+        <div class="card-title">مبيعات آخر ٧ أيام <a href="#">تفصيلي</a></div>
+        <div class="chart-bar-wrap" id="salesChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">المبيعات حسب الفئة</div>
+        <div class="donut-wrap">
+          <div class="donut"></div>
+          <div class="donut-labels">
+            <div class="donut-label"><div class="donut-dot" style="background:var(--rose)"></div><span>ميك أب ٤٥٪</span></div>
+            <div class="donut-label"><div class="donut-dot" style="background:var(--gold)"></div><span>أزياء ٢٧٪</span></div>
+            <div class="donut-label"><div class="donut-dot" style="background:var(--green)"></div><span>بشرة ١٦٪</span></div>
+            <div class="donut-label"><div class="donut-dot" style="background:var(--blue)"></div><span>إكسسوارات ١٢٪</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders + Top Products -->
+    <div class="grid-6-4">
+      <div class="card">
+        <div class="card-title">آخر الطلبات <button onclick="navigate('orders')">عرض الكل</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>رقم الطلب</th><th>العميلة</th><th>المنتجات</th><th>المبلغ</th><th>الحالة</th><th>إجراء</th></tr></thead>
+            <tbody>
+              <tr><td>#٢٠٤٧</td><td>سارة محمد</td><td>٢ منتجات</td><td>٥٨٠ ر.س</td><td><span class="badge badge-warning">معلق</span></td><td><button class="btn btn-ghost btn-sm btn-icon" onclick="toast('تم تأكيد الطلب #٢٠٤٧','success')">✓</button></td></tr>
+              <tr><td>#٢٠٤٦</td><td>ليلى العمر</td><td>١ منتج</td><td>٨٩٠ ر.س</td><td><span class="badge badge-success">مكتمل</span></td><td><button class="btn btn-ghost btn-sm btn-icon">👁</button></td></tr>
+              <tr><td>#٢٠٤٥</td><td>نورا خالد</td><td>٣ منتجات</td><td>٧٤٥ ر.س</td><td><span class="badge badge-info">قيد الشحن</span></td><td><button class="btn btn-ghost btn-sm btn-icon">👁</button></td></tr>
+              <tr><td>#٢٠٤٤</td><td>رنا سعيد</td><td>١ منتج</td><td>٢٩٠ ر.س</td><td><span class="badge badge-success">مكتمل</span></td><td><button class="btn btn-ghost btn-sm btn-icon">👁</button></td></tr>
+              <tr><td>#٢٠٤٣</td><td>هند الزهراني</td><td>٢ منتجات</td><td>١٬٢٠٠ ر.س</td><td><span class="badge badge-danger">ملغي</span></td><td><button class="btn btn-ghost btn-sm btn-icon">👁</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">أفضل المنتجات</div>
+        <div class="top-products">
+          <div class="top-prod"><span class="top-prod-num">١</span><span class="top-prod-emoji">💄</span><div class="top-prod-info"><strong>Velvet Rose Lip Kit</strong><span>٢٤٨ مبيعة</span></div><span class="top-prod-price">٢٩٠</span></div>
+          <div class="top-prod"><span class="top-prod-num">٢</span><span class="top-prod-emoji">💫</span><div class="top-prod-info"><strong>Rose Gold Eye Palette</strong><span>٣١٥ مبيعة</span></div><span class="top-prod-price">٣٤٠</span></div>
+          <div class="top-prod"><span class="top-prod-num">٣</span><span class="top-prod-emoji">🤍</span><div class="top-prod-info"><strong>Silk Abaya Pearl</strong><span>٤٤ مبيعة</span></div><span class="top-prod-price">٨٩٠</span></div>
+          <div class="top-prod"><span class="top-prod-num">٤</span><span class="top-prod-emoji">✨</span><div class="top-prod-info"><strong>Glow Serum 30ml</strong><span>٩٢ مبيعة</span></div><span class="top-prod-price">١٨٥</span></div>
+          <div class="top-prod"><span class="top-prod-num">٥</span><span class="top-prod-emoji">👜</span><div class="top-prod-info"><strong>Crystal Mini Bag</strong><span>٣٦ مبيعة</span></div><span class="top-prod-price">٤٥٠</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: ANALYTICS ══════════════════ -->
+  <div class="page-content hidden" id="page-analytics">
+    <div class="page-header">
+      <div class="page-header-left"><h1>التحليلات <em>والتقارير</em></h1><p>بيانات تفصيلية لأداء المتجر</p></div>
+      <div class="page-header-actions">
+        <select style="width:auto;padding:.55rem 1rem;"><option>آخر ٧ أيام</option><option>آخر ٣٠ يوم</option><option>آخر ٣ أشهر</option><option>هذا العام</option></select>
+        <button class="btn btn-ghost btn-sm">⬇ تصدير</button>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:2rem">
+      <div class="stat-card rose"><div class="stat-top"><div class="stat-icon rose">💰</div><span class="stat-change up">↑ ١٨٪</span></div><div class="stat-value">١١٬٢٤٠</div><div class="stat-label">إيرادات هذا الأسبوع (ر.س)</div></div>
+      <div class="stat-card gold"><div class="stat-top"><div class="stat-icon gold">🛒</div><span class="stat-change up">↑ ٥٪</span></div><div class="stat-value">٦٨</div><div class="stat-label">طلبات هذا الأسبوع</div></div>
+      <div class="stat-card green"><div class="stat-top"><div class="stat-icon green">🔁</div><span class="stat-change up">↑ ٧٪</span></div><div class="stat-value">٣٨٪</div><div class="stat-label">معدل التكرار</div></div>
+      <div class="stat-card blue"><div class="stat-top"><div class="stat-icon blue">💎</div><span class="stat-change up">↑ ٩٪</span></div><div class="stat-value">٤٧٢</div><div class="stat-label">متوسط قيمة الطلب (ر.س)</div></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:1.25rem">
+      <div class="card">
+        <div class="card-title">المبيعات اليومية</div>
+        <div class="chart-bar-wrap" id="analyticsChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">مصادر الزيارات</div>
+        <div style="display:flex;flex-direction:column;gap:1rem;padding-top:.5rem">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.4rem"><span>Instagram</span><span style="color:var(--rose2)">٤٢٪</span></div>
+            <div style="height:6px;background:var(--bg4);border-radius:99px"><div style="width:42%;height:100%;background:var(--rose);border-radius:99px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.4rem"><span>مباشر</span><span style="color:var(--gold)">٢٨٪</span></div>
+            <div style="height:6px;background:var(--bg4);border-radius:99px"><div style="width:28%;height:100%;background:var(--gold);border-radius:99px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.4rem"><span>TikTok</span><span style="color:var(--blue)">١٨٪</span></div>
+            <div style="height:6px;background:var(--bg4);border-radius:99px"><div style="width:18%;height:100%;background:var(--blue);border-radius:99px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.4rem"><span>جوجل</span><span style="color:var(--green)">١٢٪</span></div>
+            <div style="height:6px;background:var(--bg4);border-radius:99px"><div style="width:12%;height:100%;background:var(--green);border-radius:99px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">أداء الفئات هذا الشهر</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>الفئة</th><th>المبيعات</th><th>الإيراد (ر.س)</th><th>متوسط الطلب</th><th>النمو</th><th>الحالة</th></tr></thead>
+          <tbody>
+            <tr><td>💄 ميك أب</td><td>١٠٦</td><td>٢١٬٦٤٠</td><td>٢٠٤</td><td style="color:var(--green)">↑ ١٢٪</td><td><span class="badge badge-success">نشط</span></td></tr>
+            <tr><td>👗 أزياء</td><td>٦٤</td><td>١٣٬٠٨٠</td><td>٢٠٤</td><td style="color:var(--green)">↑ ٨٪</td><td><span class="badge badge-success">نشط</span></td></tr>
+            <tr><td>🌸 بشرة</td><td>٣٨</td><td>٧٬٧٢٨</td><td>٢٠٣</td><td style="color:var(--red)">↓ ٣٪</td><td><span class="badge badge-warning">يحتاج اهتمام</span></td></tr>
+            <tr><td>💎 إكسسوارات</td><td>٢٩</td><td>٥٬٧٨٢</td><td>١٩٩</td><td style="color:var(--green)">↑ ٢١٪</td><td><span class="badge badge-success">نشط</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: ORDERS ══════════════════ -->
+  <div class="page-content hidden" id="page-orders">
+    <div class="page-header">
+      <div class="page-header-left"><h1>إدارة <em>الطلبات</em></h1><p>٢٣٧ طلب هذا الشهر</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-ghost btn-sm">⬇ تصدير Excel</button>
+        <button class="btn btn-rose btn-sm" onclick="toast('تم تحديث كل الطلبات','success')">↻ تحديث</button>
+      </div>
+    </div>
+    <div class="orders-filter-bar">
+      <button class="order-filter-tab active" onclick="filterOrders(this,'all')">الكل (٢٣٧)</button>
+      <button class="order-filter-tab" onclick="filterOrders(this,'pending')">معلق (١٢)</button>
+      <button class="order-filter-tab" onclick="filterOrders(this,'shipping')">قيد الشحن (٢٨)</button>
+      <button class="order-filter-tab" onclick="filterOrders(this,'done')">مكتمل (١٨٥)</button>
+      <button class="order-filter-tab" onclick="filterOrders(this,'cancel')">ملغي (١٢)</button>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:.75rem;margin-bottom:1.5rem">
+        <input type="text" placeholder="ابحث برقم الطلب أو اسم العميلة..." style="max-width:340px"/>
+        <select style="width:auto;padding:.65rem 1rem"><option>كل المدن</option><option>الرياض</option><option>جدة</option><option>الدمام</option></select>
+        <select style="width:auto;padding:.65rem 1rem"><option>كل الطرق</option><option>Mada</option><option>Visa</option><option>Apple Pay</option></select>
+      </div>
+      <div class="table-wrap">
+        <table id="ordersTable">
+          <thead><tr><th><input type="checkbox" style="width:auto"/></th><th>رقم الطلب</th><th>العميلة</th><th>المدينة</th><th>المنتجات</th><th>المبلغ</th><th>طريقة الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;font-size:.82rem;color:var(--text3)">
+        <span>عرض ١–١٠ من ٢٣٧ طلب</span>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-ghost btn-sm">‹ السابق</button>
+          <button class="btn btn-ghost btn-sm" style="background:var(--rose-glow);border-color:var(--rose);color:var(--rose2)">1</button>
+          <button class="btn btn-ghost btn-sm">2</button>
+          <button class="btn btn-ghost btn-sm">3</button>
+          <button class="btn btn-ghost btn-sm">التالي ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: PRODUCTS ══════════════════ -->
+  <div class="page-content hidden" id="page-products">
+    <div class="page-header">
+      <div class="page-header-left"><h1>إدارة <em>المنتجات</em></h1><p>٥٣٧ منتج نشط</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-ghost btn-sm">⬇ استيراد</button>
+        <button class="btn btn-rose btn-sm" onclick="navigate('add-product')">+ إضافة منتج</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap">
+        <input type="text" id="productsSearch" placeholder="ابحث عن منتج..." style="max-width:280px" oninput="filterAndRenderProducts()"/>
+        <select id="productsCategoryFilter" style="width:auto;padding:.65rem 1rem" onchange="filterAndRenderProducts()"><option value="">كل الفئات</option><option value="ميك أب">ميك أب</option><option value="أزياء">أزياء</option><option value="العناية بالبشرة">بشرة</option><option value="إكسسوارات">إكسسوارات</option></select>
+        <select id="productsStatusFilter" style="width:auto;padding:.65rem 1rem" onchange="filterAndRenderProducts()"><option value="">كل الحالات</option><option value="active">نشط</option><option value="hidden">مخفي</option></select>
+        <select id="productsSort" style="width:auto;padding:.65rem 1rem" onchange="filterAndRenderProducts()"><option value="newest">الترتيب: الأحدث</option><option value="sold">الأكثر مبيعاً</option><option value="price-asc">السعر ↑</option><option value="price-desc">السعر ↓</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th><input type="checkbox" style="width:auto"/></th><th>المنتج</th><th>الفئة</th><th>السعر</th><th>المخزون</th><th>المبيعات</th><th>التقييم</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: ADD PRODUCT ══════════════════ -->
+  <div class="page-content hidden" id="page-add-product">
+    <div class="page-header">
+      <div class="page-header-left"><h1>إضافة <em>منتج جديد</em></h1><p>أضيفي منتجاً جديداً للمتجر</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-ghost btn-sm">حفظ كمسودة</button>
+        <button class="btn btn-rose btn-sm" onclick="saveProduct()">نشر المنتج</button>
+      </div>
+    </div>
+    <div class="grid-6-4">
+      <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <div class="card">
+          <div class="card-title">معلومات المنتج</div>
+          <div class="form-group"><label class="form-label">اسم المنتج *</label><input type="text" id="adminProductName" placeholder="مثال: Velvet Rose Lip Kit"/></div>
+          <div class="form-group"><label class="form-label">الوصف *</label><textarea id="adminProductDesc" rows="5" placeholder="اكتبي وصفاً مفصلاً للمنتج..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">البراند</label>
+              <select id="adminBrand"><option>Yoka Beauty</option><option>Yoka Fashion</option><option>Yoka Skin</option><option>Yoka Accessories</option></select></div>
+            <div class="form-group"><label class="form-label">الفئة *</label>
+              <select id="adminCategory"><option value="">اختاري فئة</option><option value="makeup">ميك أب</option><option value="fashion">أزياء</option><option value="skincare">العناية بالبشرة</option><option value="accessories">إكسسوارات</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">الفئة الفرعية</label><input type="text" placeholder="مثال: أحمر شفاه"/></div>
+            <div class="form-group"><label class="form-label">العلامات</label><input type="text" placeholder="best seller, new, ..."/></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">صور المنتج</div>
+          <div class="upload-zone" onclick="toast('رفع الصور قريباً','warning')">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text">اسحبي الصور هنا أو <strong>اضغطي للاختيار</strong></div>
+            <div class="upload-sub">PNG، JPG، WebP · حجم أقصى ٥MB لكل صورة</div>
+          </div>
+          <div class="img-preview-grid">
+            <div class="img-preview">💄<div class="img-preview-remove" onclick="toast('تم حذف الصورة','success')">✕</div></div>
+            <div class="img-preview" style="border-style:dashed;color:var(--text3)">+</div>
+            <div class="img-preview" style="border-style:dashed;color:var(--text3)">+</div>
+            <div class="img-preview" style="border-style:dashed;color:var(--text3)">+</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">الألوان والمقاسات</div>
+          <div class="form-group">
+            <label class="form-label">الألوان المتاحة</label>
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem" id="colorsWrap">
+              <div class="color-input-wrap">
+                <input type="color" value="#c41e3a"/>
+                <input type="text" value="Velvet Rouge" style="width:130px"/>
+                <button onclick="this.parentElement.remove()" style="color:var(--red)">✕</button>
+              </div>
+              <div class="color-input-wrap">
+                <input type="color" value="#8B2252"/>
+                <input type="text" value="Deep Plum" style="width:130px"/>
+                <button onclick="this.parentElement.remove()" style="color:var(--red)">✕</button>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" style="margin-top:.75rem" onclick="addColor()">+ إضافة لون</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المقاسات</label>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sizesWrap">
+              <span style="display:inline-flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:.35rem .75rem;font-size:.82rem">XS <button onclick="this.parentElement.remove()" style="color:var(--red);font-size:.75rem">✕</button></span>
+              <span style="display:inline-flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:.35rem .75rem;font-size:.82rem">S <button onclick="this.parentElement.remove()" style="color:var(--red);font-size:.75rem">✕</button></span>
+              <span style="display:inline-flex;align-items:center;gap:.4rem;background:var(--rose-glow);border:1px solid var(--rose);border-radius:var(--r-sm);padding:.35rem .75rem;font-size:.82rem;color:var(--rose2)">M <button onclick="this.parentElement.remove()" style="color:var(--red);font-size:.75rem">✕</button></span>
+              <span style="display:inline-flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:.35rem .75rem;font-size:.82rem">L <button onclick="this.parentElement.remove()" style="color:var(--red);font-size:.75rem">✕</button></span>
+            </div>
+            <button class="btn btn-ghost btn-sm" style="margin-top:.75rem" onclick="addSize()">+ إضافة مقاس</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <div class="card">
+          <div class="card-title">التسعير</div>
+          <div class="form-group"><label class="form-label">السعر الأساسي (ر.س) *</label><input type="number" id="adminPrice" placeholder="0.00" min="0"/></div>
+          <div class="form-group"><label class="form-label">سعر التخفيض (ر.س)</label><input type="number" id="adminOldPrice" placeholder="اتركيه فارغاً إن لم يكن هناك خصم"/></div>
+          <div class="form-group"><label class="form-label">تكلفة الشراء (ر.س) <span style="font-size:.7rem;color:var(--text3)">(داخلي)</span></label><input type="number" placeholder="للحساب الداخلي فقط"/></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">المخزون</div>
+          <div class="form-group"><label class="form-label">الكمية المتاحة *</label><input type="number" value="50" min="0"/></div>
+          <div class="form-group"><label class="form-label">SKU / رمز المنتج</label><input type="text" placeholder="YKA-LIP-001"/></div>
+          <div class="form-group"><label class="form-label">تنبيه عند انخفاض المخزون إلى</label><input type="number" value="5" min="1"/></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">الحالة والظهور</div>
+          <div class="toggle-row">
+            <div class="toggle-row-info"><strong>نشر المنتج</strong><span>ظهور المنتج في المتجر</span></div>
+            <label class="toggle"><input type="checkbox" id="adminIsActive" checked/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-info"><strong>منتج مميز</strong><span>ظهور في الصفحة الرئيسية</span></div>
+            <label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-info"><strong>شحن مجاني</strong><span>استثناء من رسوم الشحن</span></div>
+            <label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-group" style="margin-top:1rem">
+            <label class="form-label">بادج خاص</label>
+            <select id="adminBadge"><option value="">بدون بادج</option><option value="Best Seller">Best Seller</option><option value="New">New</option><option value="Sale">Sale</option><option value="Limited">Limited</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">رابط صورة المنتج</label>
+            <input type="url" id="adminImageUrl" placeholder="https://..."/>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">SEO</div>
+          <div class="form-group"><label class="form-label">عنوان الصفحة</label><input type="text" placeholder="عنوان محرك البحث"/></div>
+          <div class="form-group"><label class="form-label">الوصف</label><textarea rows="3" placeholder="وصف لمحركات البحث..."></textarea></div>
+        </div>
+
+        <button class="btn btn-rose" style="width:100%;justify-content:center" onclick="saveProduct()">🚀 نشر المنتج الآن</button>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center">حفظ كمسودة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: CATEGORIES ══════════════════ -->
+  <div class="page-content hidden" id="page-categories">
+    <div class="page-header">
+      <div class="page-header-left"><h1>التصنيفات <em>والفئات</em></h1><p>إدارة فئات المتجر</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-rose btn-sm" onclick="newCategoryForm()">+ فئة جديدة</button>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">الفئات الرئيسية</div>
+        <div style="display:flex;flex-direction:column;gap:.75rem" id="adminCategoriesList">
+          <p style="color:var(--text3)">جاري التحميل...</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">إضافة / تعديل فئة</div>
+        <div class="form-group"><label class="form-label">اسم الفئة *</label><input type="text" id="adminCategoryName" placeholder="مثال: ميك أب" oninput="document.getElementById('adminCategorySlug').value=this.value.replace(/\s+/g,'-').toLowerCase()"/></div>
+        <div class="form-group"><label class="form-label">الرابط (Slug) *</label><input type="text" id="adminCategorySlug" placeholder="makeup"/></div>
+        <div class="form-group"><label class="form-label">الترتيب</label><input type="number" id="adminCategoryOrder" value="0" min="0"/></div>
+        <button class="btn btn-rose" style="width:100%;justify-content:center;margin-top:.5rem" onclick="saveCategory()">حفظ الفئة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: CUSTOMERS ══════════════════ -->
+  <div class="page-content hidden" id="page-customers">
+    <div class="page-header">
+      <div class="page-header-left"><h1>إدارة <em>العملاء</em></h1><p>١٬٤٨٢ عميلة مسجلة</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-ghost btn-sm">⬇ تصدير</button>
+      </div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:2rem">
+      <div class="stat-card rose"><div class="stat-top"><div class="stat-icon rose">👑</div></div><div class="stat-value">٢١٤</div><div class="stat-label">عميلات VIP</div></div>
+      <div class="stat-card gold"><div class="stat-top"><div class="stat-icon gold">🔄</div></div><div class="stat-value">٣٨٪</div><div class="stat-label">معدل التكرار</div></div>
+      <div class="stat-card green"><div class="stat-top"><div class="stat-icon green">⭐</div></div><div class="stat-value">٤.٨</div><div class="stat-label">متوسط التقييم</div></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:.75rem;margin-bottom:1.5rem">
+        <input type="text" placeholder="ابحثي بالاسم أو البريد..." style="max-width:300px"/>
+        <select style="width:auto;padding:.65rem 1rem"><option>كل العملاء</option><option>VIP</option><option>جديد</option><option>غير نشط</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>العميلة</th><th>البريد</th><th>المدينة</th><th>الطلبات</th><th>إجمالي الإنفاق</th><th>آخر طلب</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:.75rem"><div class="admin-avatar av-1" style="width:32px;height:32px;font-size:.75rem">س</div>سارة محمد</div></td><td>sara@example.com</td><td>الرياض</td><td>١٢</td><td>٤٬٨٥٠ ر.س</td><td>اليوم</td><td><span class="badge badge-purple">VIP</span></td><td><button class="btn btn-ghost btn-sm">عرض</button></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:.75rem"><div class="admin-avatar av-2" style="width:32px;height:32px;font-size:.75rem">ن</div>نورا الأحمدي</div></td><td>nora@example.com</td><td>جدة</td><td>٨</td><td>٢٬١٦٠ ر.س</td><td>أمس</td><td><span class="badge badge-success">نشطة</span></td><td><button class="btn btn-ghost btn-sm">عرض</button></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:.75rem"><div class="admin-avatar av-3" style="width:32px;height:32px;font-size:.75rem">ل</div>ليلى العمر</div></td><td>layla@example.com</td><td>الدمام</td><td>٥</td><td>١٬٤٤٠ ر.س</td><td>٣ أيام</td><td><span class="badge badge-success">نشطة</span></td><td><button class="btn btn-ghost btn-sm">عرض</button></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:.75rem"><div class="admin-avatar av-4" style="width:32px;height:32px;font-size:.75rem">ر</div>رنا خالد</div></td><td>rana@example.com</td><td>الرياض</td><td>٢</td><td>٦٨٠ ر.س</td><td>أسبوع</td><td><span class="badge badge-info">جديدة</span></td><td><button class="btn btn-ghost btn-sm">عرض</button></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:.75rem"><div class="admin-avatar av-5" style="width:32px;height:32px;font-size:.75rem">ه</div>هند الزهراني</div></td><td>hind@example.com</td><td>مكة</td><td>١</td><td>٢٩٠ ر.س</td><td>شهر</td><td><span class="badge badge-warning">غير نشطة</span></td><td><button class="btn btn-ghost btn-sm">عرض</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: REVIEWS ══════════════════ -->
+  <div class="page-content hidden" id="page-reviews">
+    <div class="page-header">
+      <div class="page-header-left"><h1>التقييمات <em>والمراجعات</em></h1><p>إدارة آراء العملاء</p></div>
+      <div class="page-header-actions">
+        <select style="width:auto;padding:.55rem 1rem"><option>كل التقييمات</option><option>معلق موافقة</option><option>منشور</option><option>مرفوض</option></select>
+      </div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:2rem">
+      <div class="stat-card rose"><div class="stat-top"><div class="stat-icon rose">⭐</div></div><div class="stat-value">٤.٨</div><div class="stat-label">متوسط التقييم</div></div>
+      <div class="stat-card gold"><div class="stat-top"><div class="stat-icon gold">✅</div></div><div class="stat-value">٨٩٢</div><div class="stat-label">تقييمات منشورة</div></div>
+      <div class="stat-card blue"><div class="stat-top"><div class="stat-icon blue">⏳</div></div><div class="stat-value">٣</div><div class="stat-label">تنتظر الموافقة</div></div>
+      <div class="stat-card green"><div class="stat-top"><div class="stat-icon green">💬</div></div><div class="stat-value">١٢</div><div class="stat-label">بدون رد</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem" id="adminReviewsList">
+      <p style="color:var(--text3)">جاري التحميل...</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: COUPONS ══════════════════ -->
+  <div class="page-content hidden" id="page-coupons">
+    <div class="page-header">
+      <div class="page-header-left"><h1>الكوبونات <em>والخصومات</em></h1><p>إدارة كوبونات المتجر</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-rose btn-sm" onclick="toast('تم إنشاء كوبون جديد','success')">+ كوبون جديد</button>
+      </div>
+    </div>
+    <div class="grid-6-4">
+      <div class="card">
+        <div class="card-title">الكوبونات النشطة</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الكود</th><th>نوع الخصم</th><th>القيمة</th><th>الاستخدام</th><th>تاريخ الانتهاء</th><th>الحالة</th><th>إجراء</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;color:var(--rose2);font-weight:700">YOKA15</td><td>نسبة مئوية</td><td>١٥٪</td><td>٤٧ / ١٠٠</td><td>٣١ مارس ٢٠٢٦</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-ghost btn-sm btn-icon" onclick="toast('تم نسخ YOKA15','success')">📋</button></td></tr>
+              <tr><td style="font-family:monospace;color:var(--rose2);font-weight:700">WELCOME50</td><td>قيمة ثابتة</td><td>٥٠ ر.س</td><td>١٢ / ∞</td><td>٣١ ديسمبر ٢٠٢٦</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-ghost btn-sm btn-icon" onclick="toast('تم نسخ WELCOME50','success')">📋</button></td></tr>
+              <tr><td style="font-family:monospace;color:var(--rose2);font-weight:700">SUMMER25</td><td>نسبة مئوية</td><td>٢٥٪</td><td>٢٣ / ٥٠</td><td>١ يونيو ٢٠٢٦</td><td><span class="badge badge-warning">قارب الانتهاء</span></td><td><button class="btn btn-ghost btn-sm btn-icon" onclick="toast('تم نسخ SUMMER25','success')">📋</button></td></tr>
+              <tr><td style="font-family:monospace;color:var(--text3);font-weight:700">NEWUSER</td><td>شحن مجاني</td><td>—</td><td>١٨٨ / ∞</td><td>—</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-ghost btn-sm btn-icon" onclick="toast('تم نسخ NEWUSER','success')">📋</button></td></tr>
+              <tr><td style="font-family:monospace;color:var(--text3);font-weight:700">FLASH30</td><td>نسبة مئوية</td><td>٣٠٪</td><td>٥٠ / ٥٠</td><td>١ فبراير ٢٠٢٦</td><td><span class="badge badge-danger">منتهي</span></td><td><button class="btn btn-ghost btn-sm btn-icon">🔁</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">إنشاء كوبون جديد</div>
+        <div class="form-group"><label class="form-label">كود الكوبون *</label>
+          <div style="display:flex;gap:.5rem"><input type="text" placeholder="مثال: YOKA20"/><button class="btn btn-ghost btn-sm" onclick="generateCode()">توليد</button></div>
+        </div>
+        <div class="form-group"><label class="form-label">نوع الخصم</label>
+          <select><option>نسبة مئوية (%)</option><option>قيمة ثابتة (ر.س)</option><option>شحن مجاني</option></select></div>
+        <div class="form-group"><label class="form-label">قيمة الخصم</label><input type="number" placeholder="15"/></div>
+        <div class="form-group"><label class="form-label">الحد الأدنى للطلب (ر.س)</label><input type="number" placeholder="0"/></div>
+        <div class="form-group"><label class="form-label">عدد مرات الاستخدام (0 = غير محدود)</label><input type="number" placeholder="100"/></div>
+        <div class="form-group"><label class="form-label">تاريخ الانتهاء</label><input type="date"/></div>
+        <button class="btn btn-rose" style="width:100%;justify-content:center;margin-top:.5rem" onclick="toast('تم إنشاء الكوبون بنجاح 🎉','success')">إنشاء الكوبون</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: BANNERS ══════════════════ -->
+  <div class="page-content hidden" id="page-banners">
+    <div class="page-header">
+      <div class="page-header-left"><h1>البانرات <em>الإعلانية</em></h1><p>إدارة صور وبانرات الصفحة الرئيسية</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-rose btn-sm" onclick="toast('تم إضافة بانر جديد','success')">+ بانر جديد</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem" id="adminBannersList">
+      <p style="color:var(--text3)">جاري التحميل...</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <div class="card-title">إضافة بانر جديد</div>
+      <div class="grid-2">
+        <div>
+          <div class="form-group"><label class="form-label">عنوان البانر</label><input type="text" placeholder="مثال: Summer Collection 2025"/></div>
+          <div class="form-group"><label class="form-label">النص الفرعي</label><input type="text" placeholder="نص إضافي يظهر في البانر"/></div>
+          <div class="form-group"><label class="form-label">نص الزر</label><input type="text" placeholder="تسوقي الآن"/></div>
+          <div class="form-group"><label class="form-label">رابط الزر</label><input type="text" placeholder="/collections/summer"/></div>
+          <div class="form-group"><label class="form-label">الموقع</label>
+            <select><option>الصفحة الرئيسية</option><option>صفحة الميك أب</option><option>صفحة الأزياء</option><option>كل الصفحات</option></select></div>
+        </div>
+        <div>
+          <div class="form-group"><label class="form-label">صورة البانر</label>
+            <div class="upload-zone" style="height:180px" onclick="toast('رفع الصورة','warning')">
+              <div class="upload-icon">🖼️</div>
+              <div class="upload-text">ارفعي صورة البانر<br/><span style="font-size:.75rem;color:var(--text3)">يُنصح بحجم ١٩٢٠×٦٠٠px</span></div>
+            </div>
+          </div>
+          <button class="btn btn-rose" style="width:100%;justify-content:center;margin-top:.5rem" onclick="toast('تم حفظ البانر','success')">حفظ البانر</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE: SETTINGS ══════════════════ -->
+  <div class="page-content hidden" id="page-settings">
+    <div class="page-header">
+      <div class="page-header-left"><h1>إعدادات <em>المتجر</em></h1><p>التحكم الكامل في إعدادات Yoka Store</p></div>
+      <div class="page-header-actions">
+        <button class="btn btn-rose btn-sm" onclick="toast('تم حفظ الإعدادات','success')">حفظ التغييرات</button>
+      </div>
+    </div>
+    <div class="settings-tabs">
+      <button class="settings-tab active" onclick="switchSettingsTab(this,'general')">عام</button>
+      <button class="settings-tab" onclick="switchSettingsTab(this,'payment')">الدفع</button>
+      <button class="settings-tab" onclick="switchSettingsTab(this,'shipping')">الشحن</button>
+      <button class="settings-tab" onclick="switchSettingsTab(this,'notifications')">الإشعارات</button>
+      <button class="settings-tab" onclick="switchSettingsTab(this,'appearance')">المظهر</button>
+    </div>
+
+    <div id="st-general">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">معلومات المتجر</div>
+          <div class="form-group"><label class="form-label">اسم المتجر</label><input type="text" value="Yoka Store"/></div>
+          <div class="form-group"><label class="form-label">شعار المتجر</label>
+            <div class="upload-zone" onclick="toast('رفع الشعار','warning')"><div class="upload-icon">🏷️</div><div class="upload-text">اضغطي لرفع الشعار</div></div>
+          </div>
+          <div class="form-group"><label class="form-label">وصف المتجر</label><textarea rows="3">متجرك المفضل للجمال والأزياء الراقية. جودة لا تُقبل بأقل منها.</textarea></div>
+          <div class="form-group"><label class="form-label">عملة المتجر</label>
+            <select><option>ريال سعودي (ر.س)</option><option>دولار أمريكي ($)</option><option>درهم إماراتي (د.إ)</option></select></div>
+          <div class="form-group"><label class="form-label">لغة المتجر</label>
+            <select><option>العربية</option><option>English</option><option>العربية + English</option></select></div>
+        </div>
+        <div class="card">
+          <div class="card-title">التواصل الاجتماعي</div>
+          <div class="form-group"><label class="form-label">Instagram</label><input type="text" value="@yokastore" placeholder="@username"/></div>
+          <div class="form-group"><label class="form-label">TikTok</label><input type="text" value="@yokastore" placeholder="@username"/></div>
+          <div class="form-group"><label class="form-label">Snapchat</label><input type="text" value="yokastore" placeholder="username"/></div>
+          <div class="form-group"><label class="form-label">X (Twitter)</label><input type="text" placeholder="@username"/></div>
+          <div class="form-group"><label class="form-label">WhatsApp للدعم</label><input type="text" value="+966 5X XXX XXXX"/></div>
+          <div class="form-group"><label class="form-label">بريد الدعم</label><input type="email" value="support@yokastore.com"/></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="st-payment" style="display:none">
+      <div class="card">
+        <div class="card-title">طرق الدفع</div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>بطاقة Visa / Mastercard</strong><span>قبول البطاقات الائتمانية</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>بطاقة Mada</strong><span>البطاقات المحلية السعودية</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>Apple Pay</strong><span>الدفع السريع من Apple</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>الدفع عند الاستلام</strong><span>الدفع نقداً عند التوصيل</span></div><label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>تحويل بنكي</strong><span>السداد عبر التحويل</span></div><label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+      </div>
+    </div>
+
+    <div id="st-shipping" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">إعدادات الشحن</div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>شحن مجاني</strong><span>تفعيل الشحن المجاني بشرط</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="form-group" style="margin-top:1rem"><label class="form-label">الحد الأدنى للشحن المجاني (ر.س)</label><input type="number" value="200"/></div>
+          <div class="form-group"><label class="form-label">رسوم الشحن الافتراضية (ر.س)</label><input type="number" value="25"/></div>
+          <div class="form-group"><label class="form-label">أيام التوصيل المتوقعة</label>
+            <div style="display:flex;gap:.5rem;align-items:center">
+              <input type="number" value="2" style="width:80px"/> <span style="color:var(--text3)">إلى</span> <input type="number" value="5" style="width:80px"/> <span style="color:var(--text3)">أيام عمل</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">مناطق الشحن</div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>الرياض</strong><span>١–٢ أيام</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>جدة</strong><span>١–٣ أيام</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>الدمام</strong><span>٢–٣ أيام</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>باقي المناطق</strong><span>٣–٥ أيام</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>الشحن الدولي</strong><span>٧–١٤ يوم</span></div><label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="st-notifications" style="display:none">
+      <div class="card">
+        <div class="card-title">إشعارات البريد الإلكتروني</div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>طلب جديد</strong><span>إرسال إشعار عند كل طلب جديد</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>تأكيد الطلب للعميلة</strong><span>إرسال بريد تأكيد للعميلة</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>تحديث حالة الشحن</strong><span>إخطار العميلة بتحديثات التوصيل</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>مخزون منخفض</strong><span>تنبيه عند انخفاض مخزون المنتج</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>تقييم جديد</strong><span>إشعار عند كل تقييم جديد</span></div><label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><div class="toggle-row-info"><strong>عضو جديد</strong><span>إشعار عند تسجيل عميلة جديدة</span></div><label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+      </div>
+    </div>
+
+    <div id="st-appearance" style="display:none">
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title">صورة الهيرو — الصفحة الرئيسية</div>
+        <p style="color:var(--text3);font-size:.85rem;margin-bottom:1rem">غيّري صورة خلفية قسم الهيرو من الصفحة الرئيسية. اتركي الحقل فارغاً لاستخدام التدرج الافتراضي.</p>
+        <div class="form-group">
+          <label class="form-label">رابط صورة الهيرو</label>
+          <input type="url" id="adminHeroBgImage" placeholder="https://example.com/image.jpg" oninput="var p=document.getElementById('adminHeroPreview');var pi=document.getElementById('adminHeroPreviewImg');if(p&&pi){var v=this.value.trim();if(v){p.style.display='block';pi.style.backgroundImage='url('+v+')'}else p.style.display='none'}"/>
+        </div>
+        <div id="adminHeroPreview" style="margin-top:.75rem;display:none">
+          <div class="form-label" style="margin-bottom:.4rem">معاينة</div>
+          <div id="adminHeroPreviewImg" style="width:100%;max-width:320px;height:200px;border-radius:var(--r-sm);background:var(--bg3);background-size:cover;background-position:center;border:1px solid var(--border2)"></div>
+        </div>
+        <button type="button" class="btn btn-rose" style="margin-top:1rem" onclick="saveHeroBgImage()">حفظ صورة الهيرو</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">ألوان المتجر</div>
+          <div class="form-group"><label class="form-label">اللون الرئيسي</label>
+            <div class="color-input-wrap"><input type="color" value="#a97070"/><input type="text" value="#a97070" style="width:100px"/></div>
+          </div>
+          <div class="form-group"><label class="form-label">لون الخلفية</label>
+            <div class="color-input-wrap"><input type="color" value="#faf6f1"/><input type="text" value="#faf6f1" style="width:100px"/></div>
+          </div>
+          <div class="form-group"><label class="form-label">لون النص</label>
+            <div class="color-input-wrap"><input type="color" value="#1a0e1a"/><input type="text" value="#1a0e1a" style="width:100px"/></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">خيارات المظهر</div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>وضع الصيانة</strong><span>إخفاء المتجر مؤقتاً</span></div><label class="toggle"><input type="checkbox" onchange="toast(this.checked?'⚠️ المتجر في وضع الصيانة':'المتجر نشط الآن','warning')"/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>بانر الإعلان العلوي</strong><span>إظهار شريط الإعلانات</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>زر العربة العائم</strong><span>زر السلة في أسفل الشاشة</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-row-info"><strong>تقييمات المنتجات</strong><span>إظهار النجوم في الكاردات</span></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ══════════════════════════════════════════
+   YOKA ADMIN — JavaScript
+══════════════════════════════════════════ */
+
+// ── Auth ──────────────────────────────────
+function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass  = document.getElementById('loginPass').value;
+  const err   = document.getElementById('loginError');
+  if (email === 'admin@yokastore.com' && pass === 'admin123') {
+    document.getElementById('loginWrap').style.opacity = '0';
+    document.getElementById('loginWrap').style.transition = 'opacity .5s';
+    setTimeout(() => {
+      document.getElementById('loginWrap').style.display = 'none';
+      initDashboard();
+    }, 500);
+  } else {
+    err.classList.add('show');
+  }
+}
+
+function doLogout() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('loginWrap').style.opacity = '1';
+  toast('تم تسجيل الخروج بنجاح','');
+}
+
+// ── Navigation ────────────────────────────
+const PAGE_TITLES = {
+  dashboard: 'لوحة التحكم',  analytics: 'التحليلات',
+  orders: 'الطلبات',          products: 'المنتجات',
+  'add-product': 'إضافة منتج', categories: 'التصنيفات',
+  customers: 'العملاء',       reviews: 'التقييمات',
+  coupons: 'الكوبونات',       banners: 'البانرات',
+  settings: 'الإعدادات'
+};
+const TITLE_EM = {
+  dashboard: ['لوحة ','التحكم'], analytics: ['','التحليلات'],
+  orders: ['إدارة ','الطلبات'], products: ['إدارة ','المنتجات'],
+  'add-product': ['إضافة ','منتج'], categories: ['','التصنيفات'],
+  customers: ['إدارة ','العملاء'], reviews: ['','التقييمات'],
+  coupons: ['','الكوبونات'], banners: ['','البانرات'],
+  settings: ['إعدادات ','المتجر']
+};
+
+let currentPage = 'dashboard';
+
+async function navigate(page) {
+  document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+  const el = document.getElementById('page-' + page);
+  if (el) {
+    el.classList.remove('hidden');
+    el.style.opacity = '0';
+    requestAnimationFrame(() => { el.style.transition = 'opacity .35s'; el.style.opacity = '1'; });
+  }
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => { if (n.getAttribute('onclick')?.includes("'" + page + "'")) n.classList.add('active'); });
+
+  const topbarTitle = document.getElementById('topbarTitle');
+  if (topbarTitle) {
+    const t = TITLE_EM[page] || ['', ''];
+    topbarTitle.innerHTML = t[0] + '<em>' + t[1] + '</em>';
+  }
+
+  currentPage = page;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (page === 'products') { filterAndRenderProducts(); }
+  if (page === 'add-product') {
+    if (!window.editProductId) {
+      document.getElementById('adminProductName').value = '';
+      document.getElementById('adminProductDesc').value = '';
+      document.getElementById('adminPrice').value = '';
+      document.getElementById('adminOldPrice').value = '';
+      document.getElementById('adminImageUrl').value = '';
+      const h = document.querySelector('#page-add-product .page-header-left h1');
+      if (h) h.innerHTML = 'إضافة <em>منتج جديد</em>';
+    }
+    if (!ADMIN_CATEGORIES.length) await loadAdminCategories();
+  }
+  if (page === 'categories') { if (!ADMIN_CATEGORIES.length) await loadAdminCategories(); renderCategoriesList(); }
+  if (page === 'reviews') { renderReviewsList(); }
+  if (page === 'banners') { renderBannersList(); }
+}
+
+// ── Init Dashboard ───────────────────────
+async function initDashboard() {
+  renderSalesChart();
+  renderAnalyticsChart();
+  renderOrdersTable();
+  await loadAdminProducts();
+  renderProductsTable();
+  await loadAdminCategories();
+  navigate('dashboard');
+}
+
+// ── Charts ───────────────────────────────
+const DAYS = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+const SALES_DATA = [3240, 4800, 2900, 5600, 4100, 6200, 7840];
+
+function renderSalesChart() {
+  const el = document.getElementById('salesChart');
+  if (!el) return;
+  const max = Math.max(...SALES_DATA);
+  el.innerHTML = SALES_DATA.map((v, i) => `
+    <div class="chart-bar-col">
+      <div class="chart-bar rose" data-val="${v.toLocaleString('ar')} ر.س" style="height:0" data-h="${(v/max*160)}px"></div>
+      <div class="chart-label">${DAYS[i]}</div>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    el.querySelectorAll('.chart-bar').forEach(b => { b.style.height = b.dataset.h; });
+  }, 200);
+}
+
+function renderAnalyticsChart() {
+  const el = document.getElementById('analyticsChart');
+  if (!el) return;
+  const data = [1800,2400,1600,3200,2100,4800,3600];
+  const max = Math.max(...data);
+  el.innerHTML = data.map((v, i) => `
+    <div class="chart-bar-col">
+      <div class="chart-bar gold" data-val="${v.toLocaleString('ar')} ر.س" style="height:0" data-h="${(v/max*160)}px"></div>
+      <div class="chart-label">${DAYS[i]}</div>
+    </div>
+  `).join('');
+  setTimeout(() => { el.querySelectorAll('.chart-bar').forEach(b => { b.style.height = b.dataset.h; }); }, 200);
+}
+
+// ── Orders Table ─────────────────────────
+const ORDERS_DATA = [
+  {id:'#٢٠٤٧',name:'سارة محمد',city:'الرياض',count:'٢',amount:'٥٨٠',pay:'Mada',status:'pending',date:'اليوم'},
+  {id:'#٢٠٤٦',name:'ليلى العمر',city:'جدة',count:'١',amount:'٨٩٠',pay:'Apple Pay',status:'done',date:'اليوم'},
+  {id:'#٢٠٤٥',name:'نورا خالد',city:'الدمام',count:'٣',amount:'٧٤٥',pay:'Visa',status:'shipping',date:'أمس'},
+  {id:'#٢٠٤٤',name:'رنا سعيد',city:'الرياض',count:'١',amount:'٢٩٠',pay:'Mada',status:'done',date:'أمس'},
+  {id:'#٢٠٤٣',name:'هند الزهراني',city:'مكة',count:'٢',amount:'١٬٢٠٠',pay:'Visa',status:'cancel',date:'٢ يوم'},
+  {id:'#٢٠٤٢',name:'منى الأحمدي',city:'الرياض',count:'١',amount:'٤٥٠',pay:'Mastercard',status:'done',date:'٣ أيام'},
+  {id:'#٢٠٤١',name:'دانة العتيبي',city:'الخبر',count:'٤',amount:'١٬٠٨٠',pay:'Apple Pay',status:'done',date:'٣ أيام'},
+  {id:'#٢٠٤٠',name:'شهد القحطاني',city:'جدة',count:'٢',amount:'٦٢٠',pay:'Mada',status:'shipping',date:'٤ أيام'},
+];
+
+const STATUS_MAP = {
+  pending:  ['badge-warning','معلق'],
+  shipping: ['badge-info','قيد الشحن'],
+  done:     ['badge-success','مكتمل'],
+  cancel:   ['badge-danger','ملغي']
+};
+
+function renderOrdersTable(filter = 'all') {
+  const tbody = document.getElementById('ordersBody');
+  if (!tbody) return;
+  const data = filter === 'all' ? ORDERS_DATA : ORDERS_DATA.filter(o => o.status === filter);
+  tbody.innerHTML = data.map(o => {
+    const [cls, label] = STATUS_MAP[o.status];
+    return `<tr>
+      <td><input type="checkbox" style="width:auto"/></td>
+      <td style="font-weight:700;color:var(--rose2)">${o.id}</td>
+      <td>${o.name}</td>
+      <td>${o.city}</td>
+      <td>${o.count} منتجات</td>
+      <td style="font-weight:600">${o.amount} ر.س</td>
+      <td>${o.pay}</td>
+      <td><span class="badge ${cls}">${label}</span></td>
+      <td style="color:var(--text3)">${o.date}</td>
+      <td style="display:flex;gap:.4rem">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="toast('عرض الطلب ${o.id}','')">👁</button>
+        ${o.status==='pending'?`<button class="btn btn-rose btn-sm btn-icon" onclick="toast('تم تأكيد ${o.id}','success');this.closest('tr').querySelector('.badge').className='badge badge-success';this.closest('tr').querySelector('.badge').textContent='مكتمل'">✓</button>`:''}
+        ${o.status!=='cancel'?`<button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteModal('الطلب')">✕</button>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterOrders(btn, filter) {
+  document.querySelectorAll('.order-filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrdersTable(filter);
+}
+
+// ── Products Table (Supabase) ───────────────────────
+const PRODUCTS_DATA_FALLBACK = [
+  {id:null,emoji:'💄',name:'Velvet Rose Lip Kit',cat:'ميك أب',price:'٢٩٠',stock:42,sold:248,rating:5,status:'active'},
+  {id:null,emoji:'💫',name:'Rose Gold Eye Palette',cat:'ميك أب',price:'٣٤٠',stock:18,sold:315,rating:5,status:'active'},
+  {id:null,emoji:'🤍',name:'Silk Abaya Pearl',cat:'أزياء',price:'٨٩٠',stock:7,sold:44,rating:5,status:'active'},
+  {id:null,emoji:'✨',name:'Glow Serum 30ml',cat:'بشرة',price:'١٨٥',stock:3,sold:92,rating:5,status:'low'},
+  {id:null,emoji:'👗',name:'Midnight Palazzo Set',cat:'أزياء',price:'٦٢٠',stock:22,sold:67,rating:4,status:'active'},
+  {id:null,emoji:'👜',name:'Crystal Mini Bag',cat:'إكسسوارات',price:'٤٥٠',stock:15,sold:36,rating:5,status:'active'},
+  {id:null,emoji:'🎨',name:'Contour & Blush Duo',cat:'ميك أب',price:'١٩٥',stock:0,sold:189,rating:5,status:'out'},
+  {id:null,emoji:'🌸',name:'Hydra-Boost Cream',cat:'بشرة',price:'٢٢٠',stock:31,sold:128,rating:4,status:'hidden'},
+];
+let ADMIN_PRODUCTS = [];
+
+async function loadAdminProducts() {
+  if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') {
+    ADMIN_PRODUCTS = PRODUCTS_DATA_FALLBACK;
+    return;
+  }
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('products')
+      .select('id, name, brand, price, old_price, rating, rating_count, is_active, badge, badge_type, categories(name, slug)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    ADMIN_PRODUCTS = (data || []).map(p => ({
+      id: p.id,
+      emoji: '📦',
+      name: p.name,
+      cat: p.categories?.name || p.categories?.slug || '—',
+      price: String(p.price),
+      stock: '—',
+      sold: p.rating_count || 0,
+      rating: p.rating || 5,
+      status: p.is_active ? 'active' : 'hidden'
+    }));
+  } catch (e) {
+    console.error('Admin: failed to load products', e);
+    ADMIN_PRODUCTS = PRODUCTS_DATA_FALLBACK;
+  }
+}
+
+let ADMIN_CATEGORIES = [];
+async function loadAdminCategories() {
+  if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') return;
+  try {
+    const { data, error } = await window.supabaseClient.from('categories').select('id, name, slug').eq('is_active', true).order('order');
+    if (!error) ADMIN_CATEGORIES = data || [];
+    const sel = document.getElementById('adminCategory');
+    if (sel && ADMIN_CATEGORIES.length) {
+      sel.innerHTML = '<option value="">اختاري فئة</option>' + ADMIN_CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+  } catch (e) { console.error('Admin: failed to load categories', e); }
+}
+
+function renderCategoriesList() {
+  const wrap = document.getElementById('adminCategoriesList');
+  if (!wrap) return;
+  if (!ADMIN_CATEGORIES.length) {
+    wrap.innerHTML = '<p style="color:var(--text3)">لا توجد فئات. حمّلي اللوحة من الداشبورد أولاً.</p>';
+    return;
+  }
+  const icons = { makeup: '💄', fashion: '👗', skincare: '🌸', accessories: '💎' };
+  wrap.innerHTML = ADMIN_CATEGORIES.map(c => `
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--bg3);border-radius:var(--r-md);border:1px solid var(--border)">
+      <span style="font-size:1.5rem">${icons[c.slug] || '📁'}</span>
+      <div style="flex:1">
+        <div style="font-weight:600;margin-bottom:.2rem">${c.name}</div>
+        <div style="font-size:.75rem;color:var(--text3)">${c.slug}</div>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="editCategory('${c.id}')" title="تعديل">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteModal('الفئة', '${c.id}')" title="حذف">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+function newCategoryForm() {
+  window.editCategoryId = null;
+  document.getElementById('adminCategoryName').value = '';
+  document.getElementById('adminCategorySlug').value = '';
+  document.getElementById('adminCategoryOrder').value = '0';
+  toast('أدخلي بيانات الفئة الجديدة','');
+}
+async function editCategory(id) {
+  if (!id || !window.supabaseClient) return;
+  try {
+    const { data: c, error } = await window.supabaseClient.from('categories').select('*').eq('id', id).single();
+    if (error || !c) throw new Error();
+    window.editCategoryId = id;
+    document.getElementById('adminCategoryName').value = c.name || '';
+    document.getElementById('adminCategorySlug').value = c.slug || '';
+    document.getElementById('adminCategoryOrder').value = c.order ?? 0;
+    toast('تم تحميل الفئة للتعديل','success');
+  } catch (e) {
+    toast('فشل تحميل الفئة','error');
+  }
+}
+async function saveCategory() {
+  const name = document.getElementById('adminCategoryName')?.value?.trim();
+  const slug = document.getElementById('adminCategorySlug')?.value?.trim().toLowerCase().replace(/\s+/g,'-');
+  const order = parseInt(document.getElementById('adminCategoryOrder')?.value) || 0;
+  if (!name) { toast('أدخلي اسم الفئة','warning'); return; }
+  if (!slug) { toast('أدخلي الرابط (slug)','warning'); return; }
+  if (!window.supabaseClient) { toast('الاتصال غير متاح','error'); return; }
+  try {
+    if (window.editCategoryId) {
+      const { error } = await window.supabaseClient.from('categories').update({ name, slug, "order": order }).eq('id', window.editCategoryId);
+      if (error) throw error;
+      toast('تم تحديث الفئة بنجاح','success');
+    } else {
+      const { error } = await window.supabaseClient.from('categories').insert({ name, slug, "order": order });
+      if (error) throw error;
+      toast('تم إضافة الفئة بنجاح','success');
+    }
+    window.editCategoryId = null;
+    document.getElementById('adminCategoryName').value = '';
+    document.getElementById('adminCategorySlug').value = '';
+    document.getElementById('adminCategoryOrder').value = '0';
+    await loadAdminCategories();
+    renderCategoriesList();
+  } catch (e) {
+    console.error(e);
+    toast('فشل: ' + (e.message || 'خطأ') + ' (قد يكون الرابط مستخدماً)','error');
+  }
+}
+
+const REVIEWS_STATIC = [
+  {name:'نورا خالد',av:'av-2',rating:5,prod:'Midnight Palazzo Set',text:'من أجمل الفساتين اللي اشتريتها! الخامة فاخرة جداً والتطريز رهيب',status:'pending'},
+  {name:'سارة محمد',av:'av-1',rating:5,prod:'Velvet Rose Lip Kit',text:'يدوم طول اليوم ولونه جميل جداً، ما عادت أجرب غيره',status:'published'},
+  {name:'ليلى العمر',av:'av-3',rating:4,prod:'Glow Serum 30ml',text:'بشرتي صارت أوضح وأكثر إشراقاً بعد أسبوعين من الاستخدام',status:'published'}
+];
+function renderReviewsList() {
+  const wrap = document.getElementById('adminReviewsList');
+  if (!wrap) return;
+  wrap.innerHTML = REVIEWS_STATIC.map(r => `
+    <div class="card" style="display:flex;gap:1.5rem;align-items:flex-start">
+      <div class="admin-avatar ${r.av}" style="flex-shrink:0">${r.name[0]}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem">
+          <strong>${r.name}</strong>
+          <span style="color:var(--gold)">${'★'.repeat(r.rating)}</span>
+          <span style="font-size:.75rem;color:var(--text3)">على ${r.prod}</span>
+          <span class="badge ${r.status==='pending'?'badge-warning':'badge-success'}">${r.status==='pending'?'معلق':'منشور'}</span>
+        </div>
+        <p style="font-size:.88rem;color:var(--text2);line-height:1.6">"${r.text}"</p>
+        ${r.status==='pending' ? `<div style="display:flex;gap:.5rem;margin-top:.75rem">
+          <button class="btn btn-rose btn-sm" onclick="toast('تم نشر التقييم','success')">✓ نشر</button>
+          <button class="btn btn-danger btn-sm" onclick="openDeleteModal('التقييم')">✕ رفض</button>
+        </div>` : `<div style="margin-top:.75rem"><textarea rows="2" placeholder="ردّي على التقييم..." style="max-width:500px"></textarea>
+          <button class="btn btn-ghost btn-sm" style="margin-top:.5rem" onclick="toast('تم نشر الرد','success')">إرسال الرد</button></div>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+const BANNERS_STATIC = [
+  {title:'Hero — Summer 2025',status:'active',pos:'الصفحة الرئيسية',color:'#c9897a'},
+  {title:'Campaign — Makeup Collection',status:'active',pos:'صفحة الميك أب',color:'#c9a86c'},
+  {title:'Sale Banner — 30% Off',status:'hidden',pos:'كل الصفحات',color:'#7aaee8'}
+];
+function renderBannersList() {
+  const wrap = document.getElementById('adminBannersList');
+  if (!wrap) return;
+  wrap.innerHTML = BANNERS_STATIC.map(b => `
+    <div class="card" style="display:flex;align-items:center;gap:1.5rem">
+      <div style="width:120px;height:60px;background:linear-gradient(135deg,${b.color}44,${b.color}88);border-radius:var(--r-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:1px solid ${b.color}44">🖼️</div>
+      <div style="flex:1">
+        <strong>${b.title}</strong>
+        <div style="font-size:.78rem;color:var(--text3);margin-top:.2rem">الموقع: ${b.pos}</div>
+      </div>
+      <span class="badge ${b.status==='active'?'badge-success':'badge-warning'}">${b.status==='active'?'نشط':'مخفي'}</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="toast('تعديل البانر','')">✏️</button>
+        <label class="toggle"><input type="checkbox" ${b.status==='active'?'checked':''} onchange="toast(this.checked?'تم تفعيل البانر':'تم إخفاء البانر','success')"/><span class="toggle-slider"></span></label>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteModal('البانر')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+let PRODUCTS_FILTERED = [];
+function filterAndRenderProducts() {
+  const search = (document.getElementById('productsSearch')?.value || '').trim().toLowerCase();
+  const catFilter = document.getElementById('productsCategoryFilter')?.value || '';
+  const statusFilter = document.getElementById('productsStatusFilter')?.value || '';
+  const sortBy = document.getElementById('productsSort')?.value || 'newest';
+  let data = ADMIN_PRODUCTS.length ? ADMIN_PRODUCTS : PRODUCTS_DATA_FALLBACK;
+  data = data.filter(p => {
+    if (search && !(p.name||'').toLowerCase().includes(search)) return false;
+    if (catFilter && p.cat !== catFilter) return false;
+    if (statusFilter && p.status !== statusFilter) return false;
+    return true;
+  });
+  if (sortBy === 'sold') data = [...data].sort((a,b) => (b.sold||0) - (a.sold||0));
+  else if (sortBy === 'price-asc') data = [...data].sort((a,b) => parseFloat(a.price) - parseFloat(b.price));
+  else if (sortBy === 'price-desc') data = [...data].sort((a,b) => parseFloat(b.price) - parseFloat(a.price));
+  PRODUCTS_FILTERED = data;
+  renderProductsTable(data);
+}
+function renderProductsTable(data) {
+  const tbody = document.getElementById('productsBody');
+  if (!tbody) return;
+  const useData = (data !== undefined) ? data : (PRODUCTS_FILTERED.length ? PRODUCTS_FILTERED : (ADMIN_PRODUCTS.length ? ADMIN_PRODUCTS : PRODUCTS_DATA_FALLBACK));
+  const countEl = document.querySelector('#page-products .page-header-left p');
+  if (countEl) countEl.textContent = useData.length + ' منتج';
+  tbody.innerHTML = useData.map(p => {
+    const stMap = {active:['badge-success','نشط'],low:['badge-warning','مخزون منخفض'],out:['badge-danger','نفذ'],hidden:['badge-info','مخفي']};
+    const [cls,label] = stMap[p.status] || ['badge-info','—'];
+    const stockColor = (p.stock === 0 || p.stock === '٠') ? 'var(--red)' : (p.stock <= 5 && typeof p.stock === 'number') ? 'var(--gold)' : 'var(--text)';
+    return `<tr>
+      <td><input type="checkbox" style="width:auto"/></td>
+      <td><div style="display:flex;align-items:center;gap:.75rem"><span style="font-size:1.5rem">${p.emoji||'📦'}</span><strong>${p.name}</strong></div></td>
+      <td>${p.cat}</td>
+      <td style="font-weight:600">${p.price} ر.س</td>
+      <td style="color:${stockColor};font-weight:600">${p.stock}</td>
+      <td>${p.sold}</td>
+      <td style="color:var(--gold)">${'★'.repeat(p.rating)}</td>
+      <td><span class="badge ${cls}">${label}</span></td>
+      <td style="display:flex;gap:.4rem">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="editProduct('${p.id||''}')" title="تعديل">✏️</button>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="copyProductLink('${p.id||''}','${(p.name||'').replace(/'/g,"\\'")}')" title="نسخ الرابط">📋</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteModal('المنتج', '${p.id||''}')" title="حذف">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+async function editProduct(id) {
+  if (!id || !window.supabaseClient) { toast('لا يمكن تحميل المنتج','error'); return; }
+  try {
+    if (!ADMIN_CATEGORIES.length) await loadAdminCategories();
+    const { data: p, error } = await window.supabaseClient.from('products').select('*').eq('id', id).single();
+    if (error || !p) throw new Error('المنتج غير موجود');
+    window.editProductId = id;
+    document.getElementById('adminProductName').value = p.name || '';
+    document.getElementById('adminProductDesc').value = p.description || '';
+    document.getElementById('adminBrand').value = p.brand || 'Yoka Beauty';
+    document.getElementById('adminCategory').value = p.category_id || '';
+    document.getElementById('adminPrice').value = p.price || '';
+    document.getElementById('adminOldPrice').value = p.old_price || '';
+    document.getElementById('adminIsActive').checked = p.is_active !== false;
+    document.getElementById('adminBadge').value = p.badge || '';
+    document.getElementById('adminImageUrl').value = p.image_url || '';
+    const addHeader = document.querySelector('#page-add-product .page-header-left h1');
+    if (addHeader) addHeader.innerHTML = 'تعديل <em>المنتج</em>';
+    navigate('add-product');
+    toast('تم تحميل المنتج للتعديل','success');
+  } catch (e) {
+    console.error(e);
+    toast('فشل تحميل المنتج','error');
+  }
+}
+function copyProductLink(id, name) {
+  const url = id ? (window.location.origin + window.location.pathname.replace('admin.html','') + 'shop.html') : window.location.origin;
+  navigator.clipboard.writeText(url).then(() => toast('تم نسخ الرابط','success')).catch(() => toast('تم نسخ: ' + (name||id),'success'));
+}
+
+// ── Notifications ────────────────────────
+function openNotif() {
+  document.getElementById('notifPanel').classList.add('open');
+  document.getElementById('notifOverlay').classList.add('open');
+}
+function closeNotif() {
+  document.getElementById('notifPanel').classList.remove('open');
+  document.getElementById('notifOverlay').classList.remove('open');
+}
+
+// ── Delete Modal ─────────────────────────
+let deleteTargetType = null;
+let deleteId = null;
+function openDeleteModal(target, id) {
+  deleteTargetType = target;
+  deleteId = id || null;
+  const el = document.getElementById('deleteTarget');
+  if (el) el.textContent = target;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() {
+  deleteTargetType = null;
+  deleteId = null;
+  document.getElementById('deleteModal').classList.remove('open');
+}
+async function confirmDelete() {
+  if (deleteTargetType === 'المنتج' && deleteId && window.supabaseClient) {
+    try {
+      const { error } = await window.supabaseClient.from('products').delete().eq('id', deleteId);
+      if (error) throw error;
+      toast('تم حذف المنتج بنجاح','success');
+      await loadAdminProducts();
+      filterAndRenderProducts();
+    } catch (e) {
+      console.error(e);
+      toast('فشل حذف المنتج','error');
+    }
+  } else if (deleteTargetType === 'الفئة' && deleteId && window.supabaseClient) {
+    try {
+      const { error } = await window.supabaseClient.from('categories').delete().eq('id', deleteId);
+      if (error) throw error;
+      toast('تم حذف الفئة بنجاح','success');
+      await loadAdminCategories();
+      renderCategoriesList();
+    } catch (e) {
+      console.error(e);
+      toast('فشل حذف الفئة (قد تحتوي على منتجات)','error');
+    }
+  } else {
+    toast('تم الحذف بنجاح','success');
+  }
+  closeDeleteModal();
+}
+
+// ── Toast ─────────────────────────────────
+function toast(msg, type = '') {
+  const stack = document.getElementById('toastStack');
+  if (!stack) return;
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const icons = { success:'✅', error:'❌', warning:'⚠️', '':'ℹ️' };
+  el.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  stack.appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'toastOut .4s ease forwards';
+    setTimeout(() => el.remove(), 400);
+  }, 3500);
+}
+
+// ── Save Product ──────────────────────────
+async function saveProduct() {
+  const name = document.getElementById('adminProductName')?.value?.trim();
+  const description = document.getElementById('adminProductDesc')?.value?.trim();
+  const brand = document.getElementById('adminBrand')?.value?.trim() || 'Yoka Beauty';
+  const categoryId = document.getElementById('adminCategory')?.value?.trim();
+  const price = parseFloat(document.getElementById('adminPrice')?.value) || 0;
+  const oldPriceVal = document.getElementById('adminOldPrice')?.value;
+  const oldPrice = oldPriceVal ? parseFloat(oldPriceVal) : null;
+  const isActive = document.getElementById('adminIsActive')?.checked !== false;
+  const badgeVal = document.getElementById('adminBadge')?.value?.trim();
+  const imageUrl = document.getElementById('adminImageUrl')?.value?.trim() || null;
+  if (!name) { toast('أدخلي اسم المنتج','warning'); return; }
+  if (!categoryId) { toast('اختاري فئة للمنتج','warning'); return; }
+  if (price <= 0) { toast('أدخلي سعراً صحيحاً','warning'); return; }
+  const badge = badgeVal || null;
+  const badgeType = badgeVal === 'New' ? 'new' : badgeVal === 'Sale' ? 'sale' : null;
+  if (!window.supabaseClient) { toast('الاتصال بقاعدة البيانات غير متاح','error'); return; }
+  let categoryIdFinal = categoryId;
+  if (!/^[0-9a-f-]{36}$/i.test(categoryId)) {
+    const cat = ADMIN_CATEGORIES.find(c => c.slug === categoryId);
+    categoryIdFinal = cat ? cat.id : (await window.supabaseClient.from('categories').select('id').eq('slug', categoryId).single()).data?.id;
+    if (!categoryIdFinal) { toast('الفئة غير صحيحة أو لم تُحمّل بعد','warning'); return; }
+  }
+  const isEdit = !!window.editProductId;
+  try {
+    if (isEdit) {
+      const { error } = await window.supabaseClient.from('products').update({
+        name, description: description || 'منتج من Yoka Store', brand, category_id: categoryIdFinal,
+        price, old_price: oldPrice, is_active: isActive, badge, badge_type: badgeType, image_url: imageUrl
+      }).eq('id', window.editProductId);
+      if (error) throw error;
+      toast('تم تحديث المنتج بنجاح 🎉', 'success');
+    } else {
+      const { data, error } = await window.supabaseClient.from('products').insert({
+        name, description: description || 'منتج من Yoka Store', brand, category_id: categoryIdFinal,
+        price, old_price: oldPrice, is_active: isActive, badge, badge_type: badgeType, image_url: imageUrl,
+        rating: 5, rating_count: 0
+      }).select().single();
+      if (error) throw error;
+      const productId = data.id;
+      const colorsWrap = document.getElementById('colorsWrap');
+      if (colorsWrap) {
+        const colorRows = colorsWrap.querySelectorAll('.color-input-wrap');
+        for (const row of colorRows) {
+          const hex = row.querySelector('input[type="color"]')?.value;
+          const colorName = row.querySelector('input[type="text"]')?.value?.trim();
+          if (hex && colorName) {
+            await window.supabaseClient.from('product_colors').insert({ product_id: productId, color_name: colorName, color_hex: hex });
+          }
+        }
+      }
+      const sizesWrap = document.getElementById('sizesWrap');
+      if (sizesWrap) {
+        const sizeSpans = sizesWrap.querySelectorAll('span');
+        for (const span of sizeSpans) {
+          const sizeText = (span.textContent || '').replace(/✕/g,'').trim();
+          if (sizeText) {
+            await window.supabaseClient.from('product_sizes').insert({ product_id: productId, size: sizeText });
+          }
+        }
+      }
+      toast('تم نشر المنتج بنجاح 🎉', 'success');
+    }
+    window.editProductId = null;
+    document.getElementById('adminProductName').value = '';
+    document.getElementById('adminProductDesc').value = '';
+    document.getElementById('adminPrice').value = '';
+    document.getElementById('adminOldPrice').value = '';
+    document.getElementById('adminImageUrl').value = '';
+    const addHeader = document.querySelector('#page-add-product .page-header-left h1');
+    if (addHeader) addHeader.innerHTML = 'إضافة <em>منتج جديد</em>';
+    await loadAdminProducts();
+    filterAndRenderProducts();
+    setTimeout(() => navigate('products'), 800);
+  } catch (e) {
+    console.error(e);
+    toast('فشل: ' + (e.message || 'خطأ'), 'error');
+  }
+}
+
+// ── Add Color/Size ────────────────────────
+function addColor() {
+  const wrap = document.getElementById('colorsWrap');
+  const div = document.createElement('div');
+  div.className = 'color-input-wrap';
+  div.innerHTML = `<input type="color" value="#c9897a"/><input type="text" placeholder="اسم اللون" style="width:130px"/><button onclick="this.parentElement.remove()" style="color:var(--red)">✕</button>`;
+  wrap.appendChild(div);
+}
+
+function addSize() {
+  const size = prompt('أدخلي المقاس:');
+  if (!size) return;
+  const wrap = document.getElementById('sizesWrap');
+  const span = document.createElement('span');
+  span.style.cssText = 'display:inline-flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:.35rem .75rem;font-size:.82rem';
+  span.innerHTML = `${size} <button onclick="this.parentElement.remove()" style="color:var(--red);font-size:.75rem">✕</button>`;
+  wrap.appendChild(span);
+}
+
+// ── Generate Coupon Code ─────────────────
+function generateCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = 'YKA';
+  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  document.querySelector('#page-coupons input[type="text"]').value = code;
+  toast('تم توليد الكود: ' + code, 'success');
+}
+
+// ── Settings Tabs ─────────────────────────
+function switchSettingsTab(btn, id) {
+  document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['general','payment','shipping','notifications','appearance'].forEach(t => {
+    const el = document.getElementById('st-' + t);
+    if (el) el.style.display = t === id ? '' : 'none';
+  });
+  if (id === 'appearance') loadHeroBgImage();
+}
+
+async function loadHeroBgImage() {
+  const input = document.getElementById('adminHeroBgImage');
+  const preview = document.getElementById('adminHeroPreview');
+  const previewImg = document.getElementById('adminHeroPreviewImg');
+  if (!input) return;
+  if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+    try {
+      const { data, error } = await window.supabaseClient.from('site_settings').select('value').eq('key', 'hero_bg_image').single();
+      if (!error && data && data.value) {
+        input.value = data.value;
+        if (preview && previewImg) { preview.style.display = 'block'; previewImg.style.backgroundImage = `url(${data.value})`; }
+  } else {
+    input.value = '';
+    if (preview) preview.style.display = 'none';
+      }
+    } catch (e) { console.error('Admin: load hero image', e); input.value = ''; }
+  }
+}
+
+async function saveHeroBgImage() {
+  const input = document.getElementById('adminHeroBgImage');
+  if (!input) return;
+  const url = (input.value || '').trim();
+  if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+    try {
+      const { error } = await window.supabaseClient.from('site_settings').upsert({ key: 'hero_bg_image', value: url, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+      if (error) throw error;
+      toast('تم حفظ صورة الهيرو', 'success');
+    } catch (e) {
+      console.error('Admin: save hero image', e);
+      toast('فشل الحفظ', 'error');
+    }
+  } else {
+    toast('تم حفظ صورة الهيرو (بدون قاعدة بيانات)', 'success');
+  }
+}
+
+// ── Mobile Sidebar ────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+
+// ── Keyboard shortcuts ────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeDeleteModal();
+    closeNotif();
+  }
+});
+
+// ── Login on Enter ────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginWrap').style.display !== 'none') doLogin();
+});
+
+// Check mobile
+if (window.innerWidth < 900) {
+  document.getElementById('mobileMenuBtn').style.display = 'block';
+}
+</script>
+</body>
+</html>
