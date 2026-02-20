@@ -20,9 +20,9 @@ const SHOP = {
 const SHOP_LEGACY_PRODUCTS = [
   { id: 1, name: 'Velvet Rose Lip Kit', brand: 'Yoka Beauty', category: 'makeup', price: 290, oldPrice: null, badge: 'Best Seller', badgeType: '', image: 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 248, colors: ['#c41e3a'], sizes: ['N/A'], desc: 'أحمر شفاه فاخر' },
   { id: 2, name: 'Glow Serum 30ml', brand: 'Yoka Skin', category: 'skincare', price: 185, oldPrice: null, badge: 'New', badgeType: 'new', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 92, colors: [], sizes: ['30ml'], desc: 'سيروم الإشراق' },
-  { id: 3, name: 'Midnight Palazzo Set', brand: 'Yoka Fashion', category: 'fashion', price: 620, oldPrice: 850, badge: 'Sale', badgeType: 'sale', image: 'https://images.unsplash.com/photo-1539109132381-31a1ba974f82?q=80&w=800&auto=format&fit=crop', rating: 4, ratingCount: 67, colors: ['#1a1a2e'], sizes: ['S','M','L'], desc: 'طقم بالاتزو' },
+  { id: 3, name: 'Midnight Palazzo Set', brand: 'Yoka Fashion', category: 'fashion', price: 620, oldPrice: 850, badge: 'Sale', badgeType: 'sale', image: 'https://images.unsplash.com/photo-1539109132381-31a1ba974f82?q=80&w=800&auto=format&fit=crop', rating: 4, ratingCount: 67, colors: ['#1a1a2e'], sizes: ['S', 'M', 'L'], desc: 'طقم بالاتزو' },
   { id: 4, name: 'Rose Gold Eye Palette', brand: 'Yoka Beauty', category: 'makeup', price: 340, oldPrice: null, badge: 'Best Seller', badgeType: '', image: 'https://images.unsplash.com/photo-1512496011931-a2c388278ab7?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 315, colors: [], sizes: ['N/A'], desc: 'باليت عيون' },
-  { id: 5, name: 'Silk Abaya - Pearl', brand: 'Yoka Fashion', category: 'fashion', price: 890, oldPrice: null, badge: 'New', badgeType: 'new', image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 44, colors: ['#f5f0e8'], sizes: ['S','M','L'], desc: 'عباءة حريرية' },
+  { id: 5, name: 'Silk Abaya - Pearl', brand: 'Yoka Fashion', category: 'fashion', price: 890, oldPrice: null, badge: 'New', badgeType: 'new', image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 44, colors: ['#f5f0e8'], sizes: ['S', 'M', 'L'], desc: 'عباءة حريرية' },
   { id: 6, name: 'Hydra-Boost Cream', brand: 'Yoka Skin', category: 'skincare', price: 220, oldPrice: 280, badge: 'Sale', badgeType: 'sale', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=800&auto=format&fit=crop', rating: 4, ratingCount: 128, colors: [], sizes: ['50ml'], desc: 'كريم مرطب' },
   { id: 7, name: 'Contour & Blush Duo', brand: 'Yoka Beauty', category: 'makeup', price: 195, oldPrice: null, badge: '', badgeType: '', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc4033c8?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 189, colors: [], sizes: ['N/A'], desc: 'ثنائي الكونتور' },
   { id: 8, name: 'Crystal Mini Bag', brand: 'Yoka Accessories', category: 'accessories', price: 450, oldPrice: null, badge: 'New', badgeType: 'new', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=800&auto=format&fit=crop', rating: 5, ratingCount: 36, colors: ['#f0e6d3'], sizes: ['N/A'], desc: 'حقيبة ميني' }
@@ -221,20 +221,24 @@ function renderProducts() {
     grid.innerHTML = pageProducts.map(p => `
       <div class="product-card" data-id="${p.id}">
         <div class="product-card-img">
-          <img src="${p.image}" alt="${p.name}" loading="lazy">
+          <a href="product.html?id=${p.id}">
+            <img src="${p.image}" alt="${p.name}" class="product-img">
+          </a>
           ${p.badge ? `<span class="product-card-badge ${p.badgeType}">${p.badge}</span>` : ''}
           <div class="product-card-actions">
-            <button class="product-card-action-btn" onclick="openQuickView(${safeId(p.id)})">عرض سريع</button>
-            <button class="product-card-action-btn" onclick="addToCart(${safeId(p.id)})">أضف للسلة</button>
-            <button class="product-card-action-btn wishlist-btn" onclick="addToWishlist(${safeId(p.id)})" aria-label="Wishlist">♡</button>
+            <button class="product-card-action-btn" onclick="openQuickView('${p.id}')">عرض سريع</button>
+            <button class="product-card-action-btn" onclick="addToCart('${p.id}')">أضف للسلة</button>
+            <button class="product-card-action-btn wishlist-btn" onclick="addToWishlist('${p.id}')">♡</button>
           </div>
         </div>
         <div class="product-card-info">
           <div class="product-card-brand">${p.brand}</div>
-          <div class="product-card-name">${p.name}</div>
+          <a href="product.html?id=${p.id}" class="product-card-link">
+            <div class="product-card-name">${p.name}</div>
+          </a>
           <div class="product-card-price">
-            <span class="price-current">${p.price} ر.س</span>
-            ${p.oldPrice ? `<span class="price-old">${p.oldPrice} ر.س</span>` : ''}
+            <span class="price-current">${p.price} ج.م</span>
+            ${p.oldPrice ? `<span class="price-old">${p.oldPrice} ج.م</span>` : ''}
           </div>
           <div class="product-card-rating">
             <span class="stars">${'★'.repeat(p.rating)}${'☆'.repeat(5 - p.rating)}</span>
@@ -296,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelectorAll('.view-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function () {
       document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
       const grid = document.getElementById('shopGrid');

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منتج | Yoka Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <style>
+        .product-page {
+            padding: 10rem 0 5rem;
+        }
+
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .product-gallery {
+            position: sticky;
+            top: 120px;
+        }
+
+        .main-img-wrap {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: var(--blush);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .main-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info-tags {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .p-tag {
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: var(--rose-dark);
+        }
+
+        .p-name {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .p-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+
+        .p-price .old {
+            font-size: 1.25rem;
+            text-decoration: line-through;
+            color: var(--text-light);
+            margin-right: 1rem;
+            font-weight: 400;
+        }
+
+        .p-desc {
+            font-size: 1rem;
+            color: var(--text-mid);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .p-options {
+            margin-bottom: 3rem;
+        }
+
+        .option-title {
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .size-chips {
+            display: flex;
+            gap: .75rem;
+        }
+
+        .size-chip {
+            padding: .6rem 1.25rem;
+            border: 1.5px solid var(--cream-2);
+            border-radius: var(--radius-sm);
+            font-size: .85rem;
+            cursor: pointer;
+            transition: all .3s;
+        }
+
+        .size-chip.active {
+            background: var(--noir);
+            color: white;
+            border-color: var(--noir);
+        }
+
+        .p-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .add-btn {
+            flex: 1;
+            padding: 1.2rem;
+            background: var(--noir);
+            color: white;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            transition: all .3s;
+        }
+
+        .add-btn:hover {
+            background: var(--rose-dark);
+        }
+
+        .wish-btn {
+            width: 60px;
+            height: 60px;
+            border: 1.5px solid var(--cream-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all .3s;
+        }
+
+        .wish-btn:hover {
+            border-color: var(--rose-dark);
+            color: var(--rose-dark);
+        }
+
+        @media (max-width: 900px) {
+            .product-details {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .product-gallery {
+                position: static;
+            }
+
+            .p-name {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <nav class="nav scrolled" id="nav">
+        <div class="nav-left">
+            <button class="nav-menu-btn" id="menuBtn"><span></span><span></span><span></span></button>
+            <ul class="nav-links">
+                <li><a href="shop.html">المتجر</a></li>
+                <li><a href="makeup.html">ميك أب</a></li>
+                <li><a href="fashion.html">أزياء</a></li>
+                <li><a href="collections.html">المجموعات</a></li>
+            </ul>
+        </div>
+        <a href="index.html" class="nav-logo"><span class="logo-y">Y</span>oka</a>
+        <div class="nav-right">
+            <button class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg></button>
+            <a href="cart.html" class="nav-icon cart-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg><span class="cart-badge">0</span></a>
+        </div>
+    </nav>
+
+    <div class="product-page">
+        <div class="container" id="productContainer">
+            <p style="text-align:center;padding:5rem;color:var(--text-light)">جاري تحميل المنتج...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="cart-manager.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) {
+                window.location.href = 'shop.html';
+                return;
+            }
+
+            await loadProductDetails(id);
+        });
+
+        async function loadProductDetails(id) {
+            const container = document.getElementById('productContainer');
+            let product = null;
+
+            if (window.supabaseClient) {
+                try {
+                    const { data, error } = await window.supabaseClient
+                        .from('products')
+                        .select('*, categories(name, slug), product_sizes(size), product_colors(color_hex)')
+                        .eq('id', id)
+                        .single();
+
+                    if (!error && data) {
+                        product = {
+                            id: data.id,
+                            name: data.name,
+                            brand: data.brand,
+                            price: data.price,
+                            oldPrice: data.old_price,
+                            desc: data.description,
+                            image: data.image_url,
+                            category: data.categories?.name,
+                            sizes: (data.product_sizes || []).map(s => s.size),
+                            colors: (data.product_colors || []).map(c => c.color_hex)
+                        };
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            // Fallback
+            if (!product && window.PRODUCTS) {
+                product = window.PRODUCTS.find(p => p.id == id);
+            }
+
+            if (!product) {
+                container.innerHTML = '<p style="text-align:center;padding:5rem;color:var(--text-light)">المنتج غير موجود.</p>';
+                return;
+            }
+
+            document.title = `${product.name} | Yoka Store`;
+
+            container.innerHTML = `
+        <div class="product-details">
+          <div class="product-gallery">
+            <div class="main-img-wrap">
+              <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/800x1000/f5e8e8/1a0e1a?text=Product'">
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-info-tags">
+              <span class="p-tag">${product.brand}</span>
+              <span class="p-tag" style="color:var(--text-light)">/</span>
+              <span class="p-tag" style="color:var(--text-light)">${product.category || 'متنوع'}</span>
+            </div>
+            <h1 class="p-name">${product.name}</h1>
+            <div class="p-price">
+              ${product.oldPrice ? `<span class="old">${product.oldPrice} ج.م</span>` : ''}
+              <span>${product.price} ج.م</span>
+            </div>
+            <p class="p-desc">${product.desc || 'وصف المنتج غير متوفر حالياً.'}</p>
+            
+            ${product.sizes && product.sizes.length && product.sizes[0] !== 'N/A' ? `
+              <div class="p-options">
+                <div class="option-title">اختاري المقاس</div>
+                <div class="size-chips">
+                  ${product.sizes.map((s, i) => `<div class="size-chip ${i === 0 ? 'active' : ''}" onclick="this.parentElement.querySelectorAll('.size-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">${s}</div>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+            
+            <div class="p-actions">
+              <button class="add-btn" onclick="addToCart('${String(product.id).replace(/'/g, "\\'")}');">إضافة إلى السلة</button>
+              <button class="wish-btn" onclick="showToast('تمت الإضافة للمفضلة')">♡</button>
+            </div>
+            
+            <div style="margin-top:4rem; padding-top:2rem; border-top:1px solid var(--cream-2); font-size:.85rem; color:var(--text-light); line-height:2">
+              <div style="display:flex;gap:1.5rem;align-items:center;">
+                <span>✨ توصيل خلال ٣-٥ أيام عمل</span>
+                <span>📦 شحن مجاني للطلبات فوق ٥٠٠ ج.م</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+        }
+    </script>
+</body>
+
+</html>

@@ -18,6 +18,8 @@ async function loadCategoryProducts() {
   const countEl = document.getElementById('categoryProductCount');
   if (!main || !grid) return;
 
+  await loadCategoryHeroBgImageFromSettings();
+
   const slug = main.dataset.category;
   const config = CATEGORY_CONFIG[slug] || { name: slug, slug };
   const pageTitle = document.querySelector('h1.page-title, .page-hero h1');
@@ -51,20 +53,20 @@ async function loadCategoryProducts() {
 
         if (!error && data) {
           products = data.map(p => ({
-          id: p.id,
-          name: p.name,
-          brand: p.brand,
-          category: p.categories?.slug || slug,
-          price: Number(p.price),
-          oldPrice: p.old_price ? Number(p.old_price) : null,
-          badge: p.badge,
-          badgeType: p.badge_type || '',
-          image: p.image_url || 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?q=80&w=800&auto=format&fit=crop',
-          rating: p.rating ?? 5,
-          ratingCount: p.rating_count ?? 0,
-          colors: (p.product_colors || []).map(c => c.color_hex).filter(Boolean),
-          sizes: (p.product_sizes || []).map(s => s.size).filter(Boolean) || ['N/A'],
-          desc: p.description || 'منتج مميز من Yoka Store'
+            id: p.id,
+            name: p.name,
+            brand: p.brand,
+            category: p.categories?.slug || slug,
+            price: Number(p.price),
+            oldPrice: p.old_price ? Number(p.old_price) : null,
+            badge: p.badge,
+            badgeType: p.badge_type || '',
+            image: p.image_url || 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?q=80&w=800&auto=format&fit=crop',
+            rating: p.rating ?? 5,
+            ratingCount: p.rating_count ?? 0,
+            colors: (p.product_colors || []).map(c => c.color_hex).filter(Boolean),
+            sizes: (p.product_sizes || []).map(s => s.size).filter(Boolean) || ['N/A'],
+            desc: p.description || 'منتج مميز من Yoka Store'
           }));
         }
       }
@@ -119,6 +121,34 @@ async function loadCategoryProducts() {
     el.addEventListener('mouseenter', () => cursor?.classList.add('hover'));
     el.addEventListener('mouseleave', () => cursor?.classList.remove('hover'));
   });
+}
+
+async function loadCategoryHeroBgImageFromSettings() {
+  if (!document.querySelector('.page-hero')) return;
+  if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') return;
+
+  // Get the category slug from the page
+  const main = document.querySelector('[data-category]');
+  const slug = main?.dataset?.category;
+  if (!slug) return;
+
+  // Each category has its own key: hero_bg_makeup, hero_bg_fashion, etc.
+  const key = `hero_bg_${slug}`;
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('site_settings')
+      .select('value')
+      .eq('key', key)
+      .single();
+    if (!error && data && data.value && data.value.trim()) {
+      document.documentElement.style.setProperty('--page-hero-bg-image', `url(${data.value.trim()})`);
+      // أضف class لتفعيل الـ overlay الداكن وتغيير لون النص للأبيض
+      const heroEl = document.querySelector('.page-hero');
+      if (heroEl) {
+        heroEl.classList.add('has-bg-image');
+      }
+    }
+  } catch (e) { /* ignore */ }
 }
 
 document.addEventListener('DOMContentLoaded', loadCategoryProducts);

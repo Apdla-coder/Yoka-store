@@ -164,6 +164,22 @@ CREATE POLICY "Allow anon to manage site_settings" ON public.site_settings
 INSERT INTO public.site_settings (key, value) VALUES ('hero_bg_image', '')
 ON CONFLICT (key) DO NOTHING;
 
+INSERT INTO public.site_settings (key, value) VALUES ('category_hero_bg_image', '')
+ON CONFLICT (key) DO NOTHING;
+
+-- Per-category hero background images (used by admin panel)
+INSERT INTO public.site_settings (key, value) VALUES ('hero_bg_makeup', '')
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.site_settings (key, value) VALUES ('hero_bg_fashion', '')
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.site_settings (key, value) VALUES ('hero_bg_skincare', '')
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.site_settings (key, value) VALUES ('hero_bg_accessories', '')
+ON CONFLICT (key) DO NOTHING;
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- تم. راجعي السياسات حسب احتياجك (مثلاً تقييد لوحة التحكم بـ auth فقط)
 -- ═══════════════════════════════════════════════════════════════════════════════

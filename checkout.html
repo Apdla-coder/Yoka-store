@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إتمام الطلب | Yoka Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <style>
+        .checkout-page {
+            padding: 10rem 0 5rem;
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .checkout-form-section {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .checkout-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: .6rem;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: .9rem 1.25rem;
+            border: 1.5px solid var(--cream-2);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: .95rem;
+            transition: all .3s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--rose-dark);
+            box-shadow: 0 0 0 3px rgba(212, 165, 165, .15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .payment-options {
+            margin-top: 2.5rem;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            border: 1.5px solid var(--cream-2);
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all .3s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--rose-light);
+        }
+
+        .payment-option.active {
+            border-color: var(--rose-dark);
+            background: rgba(212, 165, 165, .05);
+        }
+
+        .payment-option input {
+            display: none;
+        }
+
+        .payment-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--rose-light);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-option.active .payment-circle {
+            border-color: var(--rose-dark);
+        }
+
+        .payment-option.active .payment-circle::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--rose-dark);
+            border-radius: 50%;
+        }
+
+        /* Summary Side */
+        .order-summary-card {
+            background: var(--noir);
+            color: var(--cream);
+            padding: 2.5rem;
+            border-radius: var(--radius-md);
+            position: sticky;
+            top: 120px;
+        }
+
+        .sum-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+            padding-bottom: 1rem;
+        }
+
+        .sum-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+        }
+
+        .sum-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            align-items: center;
+        }
+
+        .sum-item img {
+            width: 50px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .sum-item-info {
+            flex: 1;
+        }
+
+        .sum-item-name {
+            font-size: .85rem;
+            font-weight: 500;
+            margin-bottom: .2rem;
+        }
+
+        .sum-item-price {
+            font-size: .8rem;
+            color: rgba(255, 255, 255, .6);
+        }
+
+        .sum-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: .75rem;
+            font-size: .9rem;
+        }
+
+        .sum-row.total {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, .1);
+            color: var(--rose);
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--rose-dark);
+            color: white;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            transition: all .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .75rem;
+        }
+
+        .place-order-btn:hover {
+            background: #b87b7b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(169, 112, 112, .3);
+        }
+
+        .place-order-btn:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+        /* Success State */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--noir);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .success-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all .6s var(--spring);
+        }
+
+        .success-overlay.show {
+            display: flex;
+        }
+
+        .success-overlay.show .success-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: var(--rose);
+        }
+
+        @media (max-width: 1000px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .order-summary-card {
+                position: static;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <nav class="nav scrolled" id="nav">
+        <div class="nav-left">
+            <ul class="nav-links">
+                <li><a href="shop.html">المتجر</a></li>
+                <li><a href="index.html">الرئيسية</a></li>
+            </ul>
+        </div>
+        <a href="index.html" class="nav-logo"><span class="logo-y">Y</span>oka</a>
+    </nav>
+
+    <div class="checkout-page">
+        <div class="container">
+            <div class="checkout-layout">
+
+                <!-- Form Section -->
+                <main class="checkout-form-section">
+                    <h1 class="checkout-title">تفاصيل <em>الشحن</em></h1>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">الاسم بالكامل</label>
+                            <input type="text" class="form-input" placeholder="نورهان محمد" id="checkoutName">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم الجوال</label>
+                            <input type="tel" class="form-input" placeholder="01XXXXXXXXX" id="checkoutPhone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <input type="email" class="form-input" placeholder="example@email.com" id="checkoutEmail">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">المدينة</label>
+                            <select class="form-input" id="checkoutCity">
+                                <option value="cairo">القاهرة</option>
+                                <option value="giza">الجيزة</option>
+                                <option value="alex">الإسكندرية</option>
+                                <option value="mansoura">المنصورة</option>
+                                <option value="other">محافظة أخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">المنطقة / الحي</label>
+                            <input type="text" class="form-input" placeholder="المعادي" id="checkoutArea">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">العنوان بالتفصيل</label>
+                        <textarea class="form-input" rows="3" placeholder="اسم الشارع، رقم العمارة، رقم الشقة..."
+                            id="checkoutAddress"></textarea>
+                    </div>
+
+                    <div class="payment-options">
+                        <label class="form-label">طريقة الدفع</label>
+
+                        <div class="payment-option active" onclick="selectPayment(this, 'card')">
+                            <div class="payment-circle"></div>
+                            <span>بطاقة ائتمان / بطاقة مدى</span>
+                            <span style="margin-right:auto;font-size:1.5rem">💳</span>
+                        </div>
+
+                        <div class="payment-option" onclick="selectPayment(this, 'apple')">
+                            <div class="payment-circle"></div>
+                            <span>Apple Pay</span>
+                            <span style="margin-right:auto;font-size:1.5rem">🍎</span>
+                        </div>
+
+                        <div class="payment-option" onclick="selectPayment(this, 'cod')">
+                            <div class="payment-circle"></div>
+                            <span>الدفع عند الاستلام</span>
+                            <span style="margin-right:auto;font-size:1.5rem">💵</span>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Summary Section -->
+                <aside class="order-summary-card">
+                    <h2 class="sum-title">ملخص <em>الطلب</em></h2>
+
+                    <div class="sum-items" id="summaryItems">
+                        <!-- Items via JS -->
+                    </div>
+
+                    <div class="sum-row">
+                        <span>المجموع</span>
+                        <span id="sumSubtotal">٠ ج.م</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>رسوم الشحن</span>
+                        <span id="sumShipping">مجاني</span>
+                    </div>
+                    <div class="sum-row total">
+                        <span>الإجمالي</span>
+                        <span id="sumTotal">٠ ج.م</span>
+                    </div>
+
+                    <button class="place-order-btn" id="placeOrderBtn" onclick="completeOrder()">إكمال الطلب</button>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">✨</div>
+            <h1 font-family="var(--font-display)" style="font-size:3.5rem;font-weight:300;margin-bottom:1rem">شكراً
+                <em>لكِ</em>
+            </h1>
+            <p style="font-size:1.1rem;color:rgba(255,255,255,7);margin-bottom:2.5rem">تم استلام طلبك بنجاح. سنقوم
+                بالتواصل معك قريباً.</p>
+            <div style="font-size:.9rem;color:var(--rose);margin-bottom:2.5rem">رقم الطلب: <strong
+                    id="orderNumber">#YK-0000</strong></div>
+            <a href="index.html" class="btn-primary" style="display:inline-flex">العودة للرئيسية</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="cart-manager.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for cart manager
+            await new Promise(resolve => setTimeout(resolve, 500));
+            renderSummary();
+        });
+
+        function renderSummary() {
+            if (!window.cartManager) return;
+            const items = window.cartManager.getCartItems();
+            const container = document.getElementById('summaryItems');
+
+            if (items.length === 0) {
+                window.location.href = 'shop.html';
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+        <div class="sum-item">
+          <img src="${item.image}" alt="${item.name}">
+          <div class="sum-item-info">
+            <div class="sum-item-name">${item.name}</div>
+            <div class="sum-item-price">${item.quantity} × ${item.price} ج.م</div>
+          </div>
+        </div>
+      `).join('');
+
+            const subtotal = window.cartManager.getCartTotal();
+            document.getElementById('sumSubtotal').textContent = `${subtotal} ج.م`;
+            document.getElementById('sumTotal').textContent = `${subtotal} ج.م`;
+        }
+
+        function selectPayment(el, method) {
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        async function completeOrder() {
+            const btn = document.getElementById('placeOrderBtn');
+            const originalText = btn.innerHTML;
+
+            // Basic validation
+            const name = document.getElementById('checkoutName').value.trim();
+            const phone = document.getElementById('checkoutPhone').value.trim();
+            const email = document.getElementById('checkoutEmail').value.trim();
+            const city = document.getElementById('checkoutCity').value;
+            const area = document.getElementById('checkoutArea').value.trim();
+            const address = document.getElementById('checkoutAddress').value.trim();
+
+            if (!name || !phone || !address) {
+                showToast('يرجى التأكد من كتابة الاسم، رقم الجوال، والعنوان بالتفصيل');
+                return;
+            }
+
+            // Get Payment Method
+            const activePayment = document.querySelector('.payment-option.active span').textContent;
+            let paymentMethod = 'card';
+            if (activePayment.includes('Apple')) paymentMethod = 'apple';
+            if (activePayment.includes('الاستلام')) paymentMethod = 'cod';
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader-inline"></span> جاري معالجة الطلب...';
+
+            try {
+                if (!window.cartManager) throw new Error('Cart manager not initialized');
+
+                const items = window.cartManager.getCartItems();
+                const total = window.cartManager.getCartTotal();
+
+                if (items.length === 0) {
+                    showToast('السلة فارغة!');
+                    window.location.href = 'shop.html';
+                    return;
+                }
+
+                if (!window.supabaseClient) throw new Error('Database connection missing');
+
+                // 1. Create Order
+                const { data: order, error: orderError } = await window.supabaseClient
+                    .from('orders')
+                    .insert({
+                        customer_name: name,
+                        customer_phone: phone,
+                        customer_email: email,
+                        city: city,
+                        area: area,
+                        address: address,
+                        subtotal: total,
+                        total_amount: total,
+                        total: total,
+                        payment_method: paymentMethod,
+                        status: 'pending'
+                    })
+                    .select()
+                    .single();
+
+                if (orderError) throw orderError;
+
+                // 2. Create Order Items
+                const orderItems = items.map(item => ({
+                    order_id: order.id,
+                    product_id: item.productId,
+                    product_name: item.name,
+                    product_image: item.image,
+                    quantity: item.quantity,
+                    price_at_time: item.price
+                }));
+
+                const { error: itemsError } = await window.supabaseClient
+                    .from('order_items')
+                    .insert(orderItems);
+
+                if (itemsError) throw itemsError;
+
+                // 3. Success
+                await window.cartManager.clearCart();
+
+                document.getElementById('orderNumber').textContent = '#' + (order.order_number || order.id.slice(0, 8));
+
+                const overlay = document.getElementById('successOverlay');
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+
+            } catch (err) {
+                console.error('Order Error:', err);
+                showToast('حدث خطأ أثناء إتمام الطلب: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function showToast(msg) {
+            // Check if global toast exists (common in this template), otherwise alert
+            if (typeof window.toast === 'function') {
+                window.toast(msg);
+            } else {
+                alert(msg);
+            }
+        }
+    </script>
+</body>
+
+</html>

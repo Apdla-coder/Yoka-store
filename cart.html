@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>سلة التسوق | Yoka Store</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@200;300;400;500;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Supabase Client Configuration -->
   <script src="supabase-client.js"></script>
   <style>
-    .cart-page { padding: 8rem 0 5rem; }
+    .cart-page {
+      padding: 8rem 0 5rem;
+    }
+
     .cart-layout {
       display: grid;
       grid-template-columns: 1fr 380px;
       gap: 3rem;
       align-items: start;
     }
+
     .cart-header {
       display: flex;
       align-items: center;
@@ -28,12 +35,17 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--cream-2);
     }
+
     .cart-header h2 {
       font-family: var(--font-display);
       font-size: 1.8rem;
       font-weight: 400;
     }
-    .cart-header .item-count { font-size: .85rem; color: var(--text-light); }
+
+    .cart-header .item-count {
+      font-size: .85rem;
+      color: var(--text-light);
+    }
 
     .cart-item {
       display: grid;
@@ -43,8 +55,10 @@
       border-bottom: 1px solid var(--cream-2);
       align-items: center;
     }
+
     .cart-item-img {
-      width: 100px; height: 120px;
+      width: 100px;
+      height: 120px;
       border-radius: var(--radius-md);
       background: var(--blush);
       display: flex;
@@ -52,11 +66,38 @@
       justify-content: center;
       font-size: 3rem;
     }
-    .cart-item-brand { font-size: .72rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--rose-dark); margin-bottom: .25rem; }
-    .cart-item-name { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: .35rem; }
-    .cart-item-meta { font-size: .82rem; color: var(--text-light); margin-bottom: .75rem; }
-    .cart-item-remove { font-size: .78rem; color: var(--text-light); cursor: none; transition: color var(--transition); }
-    .cart-item-remove:hover { color: #e74c3c; }
+
+    .cart-item-brand {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--rose-dark);
+      margin-bottom: .25rem;
+    }
+
+    .cart-item-name {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      margin-bottom: .35rem;
+    }
+
+    .cart-item-meta {
+      font-size: .82rem;
+      color: var(--text-light);
+      margin-bottom: .75rem;
+    }
+
+    .cart-item-remove {
+      font-size: .78rem;
+      color: var(--text-light);
+      cursor: none;
+      transition: color var(--transition);
+    }
+
+    .cart-item-remove:hover {
+      color: #e74c3c;
+    }
 
     .quantity-control {
       display: flex;
@@ -66,8 +107,10 @@
       border-radius: var(--radius-sm);
       overflow: hidden;
     }
+
     .qty-btn {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -77,7 +120,12 @@
       transition: background var(--transition), color var(--transition);
       cursor: none;
     }
-    .qty-btn:hover { background: var(--noir); color: white; }
+
+    .qty-btn:hover {
+      background: var(--noir);
+      color: white;
+    }
+
     .qty-num {
       width: 40px;
       text-align: center;
@@ -89,8 +137,18 @@
       background: white;
     }
 
-    .cart-item-right { text-align: left; display: flex; flex-direction: column; align-items: flex-end; gap: .75rem; }
-    .cart-item-price { font-size: 1.1rem; font-weight: 700; }
+    .cart-item-right {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .75rem;
+    }
+
+    .cart-item-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
 
     /* Order Summary */
     .order-summary {
@@ -100,14 +158,16 @@
       position: sticky;
       top: 100px;
     }
+
     .summary-title {
       font-family: var(--font-display);
       font-size: 1.4rem;
       font-weight: 600;
       margin-bottom: 1.5rem;
       padding-bottom: .75rem;
-      border-bottom: 1px solid rgba(0,0,0,.08);
+      border-bottom: 1px solid rgba(0, 0, 0, .08);
     }
+
     .summary-row {
       display: flex;
       justify-content: space-between;
@@ -115,25 +175,36 @@
       padding: .6rem 0;
       font-size: .9rem;
     }
+
     .summary-row.total {
-      border-top: 1px solid rgba(0,0,0,.1);
+      border-top: 1px solid rgba(0, 0, 0, .1);
       margin-top: .75rem;
       padding-top: 1rem;
       font-size: 1.1rem;
       font-weight: 700;
     }
-    .summary-row span:first-child { color: var(--text-mid); }
-    .summary-row.total span:first-child { color: var(--text-dark); }
 
-    .promo-section { margin: 1.5rem 0; }
+    .summary-row span:first-child {
+      color: var(--text-mid);
+    }
+
+    .summary-row.total span:first-child {
+      color: var(--text-dark);
+    }
+
+    .promo-section {
+      margin: 1.5rem 0;
+    }
+
     .promo-form {
       display: flex;
       gap: 0;
-      border: 1.5px solid rgba(0,0,0,.1);
+      border: 1.5px solid rgba(0, 0, 0, .1);
       border-radius: var(--radius-sm);
       overflow: hidden;
       background: white;
     }
+
     .promo-input {
       flex: 1;
       padding: .7rem 1rem;
@@ -142,6 +213,7 @@
       font-family: var(--font-body);
       font-size: .85rem;
     }
+
     .promo-btn {
       padding: .7rem 1.25rem;
       background: var(--rose-dark);
@@ -152,7 +224,10 @@
       cursor: none;
       transition: background var(--transition);
     }
-    .promo-btn:hover { background: var(--noir); }
+
+    .promo-btn:hover {
+      background: var(--noir);
+    }
 
     .checkout-btn {
       width: 100%;
@@ -167,7 +242,11 @@
       transition: background var(--transition), transform var(--spring);
       margin-top: 1.25rem;
     }
-    .checkout-btn:hover { background: var(--rose-dark); transform: translateY(-2px); }
+
+    .checkout-btn:hover {
+      background: var(--rose-dark);
+      transform: translateY(-2px);
+    }
 
     .payment-icons {
       display: flex;
@@ -175,6 +254,7 @@
       justify-content: center;
       margin-top: 1.25rem;
     }
+
     .payment-icon {
       background: white;
       border-radius: 6px;
@@ -195,17 +275,47 @@
       margin-top: 1rem;
       transition: gap var(--transition);
     }
-    .continue-link:hover { gap: .85rem; }
+
+    .continue-link:hover {
+      gap: .85rem;
+    }
 
     @media (max-width: 900px) {
-      .cart-layout { grid-template-columns: 1fr; }
+      .cart-layout {
+        grid-template-columns: 1fr;
+      }
     }
+
     @media (max-width: 600px) {
-      .cart-item { grid-template-columns: 80px 1fr; }
-      .cart-item-right { grid-column: 2; }
+      .cart-item {
+        grid-template-columns: 80px 1fr;
+      }
+
+      .cart-item-right {
+        grid-column: 2;
+      }
+    }
+
+    .loader-inline {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="cursor" id="cursor"></div>
@@ -223,8 +333,17 @@
     </div>
     <a href="index.html" class="nav-logo"><span class="logo-y">Y</span>oka</a>
     <div class="nav-right">
-      <button class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
-      <a href="cart.html" class="nav-icon cart-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-badge" id="cartBadge">3</span></a>
+      <button class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg></button>
+      <a href="cart.html" class="nav-icon cart-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg><span class="cart-badge" id="cartBadge">3</span></a>
     </div>
   </nav>
 
@@ -232,7 +351,8 @@
     <div class="container">
 
       <!-- Breadcrumb -->
-      <nav style="font-size:.8rem;color:var(--text-light);display:flex;gap:.5rem;align-items:center;margin-bottom:2rem;">
+      <nav
+        style="font-size:.8rem;color:var(--text-light);display:flex;gap:.5rem;align-items:center;margin-bottom:2rem;">
         <a href="index.html" style="color:var(--text-light)">الرئيسية</a>
         <span>›</span>
         <span style="color:var(--rose-dark)">سلة التسوق</span>
@@ -259,7 +379,7 @@
 
           <div class="summary-row">
             <span>المجموع الجزئي</span>
-            <span id="subtotal">١٬٠٩٥ ر.س</span>
+            <span id="subtotal">١٬٠٩٥ ج.م</span>
           </div>
           <div class="summary-row">
             <span>رسوم الشحن</span>
@@ -271,7 +391,7 @@
           </div>
           <div class="summary-row total">
             <span>الإجمالي</span>
-            <span id="total">٠ ر.س</span>
+            <span id="total">٠ ج.م</span>
           </div>
 
           <div class="promo-section">
@@ -284,7 +404,7 @@
             </div>
           </div>
 
-          <button class="checkout-btn" onclick="showToast('جاري الانتقال لإتمام الطلب...')">إتمام الشراء ←</button>
+          <button class="checkout-btn" id="checkoutBtn" onclick="processCheckout()">إتمام الشراء ←</button>
 
           <div class="payment-icons">
             <span class="payment-icon">Visa</span>
@@ -293,8 +413,11 @@
             <span class="payment-icon">Apple Pay</span>
           </div>
 
-          <div style="margin-top:1.5rem;padding:.75rem;background:rgba(212,165,165,.1);border-radius:var(--radius-sm);border:1px solid var(--rose-light);">
-            <p style="font-size:.78rem;color:var(--rose-dark);text-align:center;">🎁 أضيفي ٤٠٥ ر.س للحصول على <strong>شحن مجاني + هدية مجانية</strong></p>
+          <div
+            style="margin-top:1.5rem;padding:.75rem;background:rgba(212,165,165,.1);border-radius:var(--radius-sm);border:1px solid var(--rose-light);">
+            <p style="font-size:.78rem;color:var(--rose-dark);text-align:center;">🎁 أضيفي ٤٠٥ ج.م للحصول على
+              <strong>شحن مجاني + هدية مجانية</strong>
+            </p>
           </div>
         </div>
 
@@ -310,7 +433,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       // Wait for cart manager to initialize
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       loadCartItems();
       updateTotals();
     });
@@ -318,14 +441,14 @@
     async function loadCartItems() {
       const container = document.getElementById('cartItemsContainer');
       const itemCount = document.getElementById('itemCount');
-      
+
       if (!window.cartManager) {
         container.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-mid)">جاري تحميل السلة...</p>';
         return;
       }
 
       const items = window.cartManager.getCartItems();
-      
+
       if (items.length === 0) {
         container.innerHTML = `
           <div style="text-align:center;padding:3rem;">
@@ -349,7 +472,7 @@
             <button class="cart-item-remove" onclick="removeCartItem(${item.productId})">✕ حذف</button>
           </div>
           <div class="cart-item-right">
-            <div class="cart-item-price">${item.price} ر.س</div>
+            <div class="cart-item-price">${item.price} ج.م</div>
             <div class="quantity-control">
               <button class="qty-btn" onclick="updateItemQuantity(${item.productId}, -1)">−</button>
               <input class="qty-num" type="number" value="${item.quantity}" min="1" max="10" onchange="setQuantity(${item.productId}, this.value)" />
@@ -378,7 +501,7 @@
       const input = document.querySelector(`[data-id="${productId}"] .qty-num`);
       const currentQty = parseInt(input.value);
       const newQty = Math.max(1, Math.min(10, currentQty + delta));
-      
+
       const success = await window.cartManager.updateQuantity(productId, newQty);
       if (success) {
         input.value = newQty;
@@ -400,19 +523,19 @@
 
     function updateTotals() {
       if (!window.cartManager) return;
-      
+
       const subtotal = window.cartManager.getCartTotal();
-      document.getElementById('subtotal').textContent = `${subtotal} ر.س`;
-      document.getElementById('total').textContent = `${subtotal} ر.س`;
-      
+      document.getElementById('subtotal').textContent = `${subtotal} ج.م`;
+      document.getElementById('total').textContent = `${subtotal} ج.م`;
+
       // Update free shipping message
       const freeShippingThreshold = 500;
       const remaining = freeShippingThreshold - subtotal;
       const freeShippingMsg = document.querySelector('.order-summary div[style*="background"]');
-      
+
       if (freeShippingMsg) {
         if (remaining > 0) {
-          freeShippingMsg.innerHTML = `🎁 أضيفي ${remaining} ر.س للحصول على <strong>شحن مجاني + هدية مجانية</strong>`;
+          freeShippingMsg.innerHTML = `🎁 أضيفي ${remaining} ج.م للحصول على <strong>شحن مجاني + هدية مجانية</strong>`;
         } else {
           freeShippingMsg.innerHTML = `🎉 <strong>لقد حصلتِ على شحن مجاني!</strong>`;
         }
@@ -425,15 +548,27 @@
         const subtotal = window.cartManager.getCartTotal();
         const discount = subtotal * 0.15;
         const total = subtotal - discount;
-        
-        document.getElementById('discount').textContent = `−${discount.toFixed(0)} ر.س`;
+
+        document.getElementById('discount').textContent = `−${discount.toFixed(0)} ج.م`;
         document.getElementById('discount').style.color = 'var(--rose-dark)';
-        document.getElementById('total').textContent = `${total.toFixed(0)} ر.س`;
+        document.getElementById('total').textContent = `${total.toFixed(0)} ج.م`;
         showToast('تم تطبيق الكود! خصم ١٥٪ 🎉');
       } else {
         showToast('الكود غير صحيح. حاولي مرة أخرى');
       }
     }
+
+    function processCheckout() {
+      const btn = document.getElementById('checkoutBtn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader-inline"></span> جاري الانتقال لإتمام الطلب...';
+
+      setTimeout(() => {
+        window.location.href = 'checkout.html';
+      }, 2500);
+    }
   </script>
 </body>
+
 </html>

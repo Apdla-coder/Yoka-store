@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Yoka Store | متجر يوكا</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@200;300;400;500;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Supabase Client Configuration -->
   <script src="supabase-client.js"></script>
 </head>
+
 <body>
 
   <!-- Custom Cursor -->
@@ -46,10 +50,22 @@
     </a>
 
     <div class="nav-right">
-      <button class="nav-icon" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
-      <button class="nav-icon" aria-label="Wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <button class="nav-icon" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg></button>
+      <button class="nav-icon" aria-label="Wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg></button>
       <a href="cart.html" class="nav-icon cart-icon" aria-label="Cart">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
         <span class="cart-badge">0</span>
       </a>
     </div>
@@ -80,53 +96,107 @@
       <div class="hero-pattern"></div>
     </div>
 
+    <!-- Left: Content -->
     <div class="hero-content">
-      <div class="hero-tag" data-reveal>New Collection 2025</div>
-      <h1 class="hero-title" data-reveal>
+      <div class="hero-eyebrow" data-reveal>
+        <span class="hero-line-accent"></span>
+        <span class="hero-tag">New Collection 2025</span>
+      </div>
+
+      <h1 class="hero-title">
         <span class="hero-title-line">أنوثة</span>
         <span class="hero-title-line italic">لا حدود</span>
         <span class="hero-title-line">لها</span>
       </h1>
+
       <p class="hero-subtitle" data-reveal>
-        اكتشفي عالماً من الجمال والأناقة مع Yoka Store —<br/>
+        اكتشفي عالماً من الجمال والأناقة مع Yoka Store —<br />
         أزياء راقية وميك أب فاخر لكل امرأة
       </p>
+
       <div class="hero-actions" data-reveal>
-        <a href="shop.html" class="btn-primary">تسوقي الآن</a>
+        <a href="shop.html" class="btn-primary">
+          <span>تسوقي الآن</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
         <a href="collections.html" class="btn-outline">استكشفي المجموعات</a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="hero-stats" data-reveal>
+        <div class="hero-stat">
+          <span class="hero-stat-num">+٥٠٠</span>
+          <span class="hero-stat-label">منتج فاخر</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">٤.٩ ★</span>
+          <span class="hero-stat-label">تقييم العملاء</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">٢٤ ساعة</span>
+          <span class="hero-stat-label">توصيل سريع</span>
+        </div>
       </div>
     </div>
 
+    <!-- Right: Visual -->
     <div class="hero-visual">
       <div class="hero-image-frame">
         <div class="hero-image-bg"></div>
+
+        <!-- Featured product label -->
+        <div class="hero-featured-badge">
+          <span class="hero-featured-dot"></span>
+          Featured
+        </div>
+
+        <!-- Floating cards -->
         <div class="hero-floating-card card-1">
-          <span class="card-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Star" style="width:16px;height:16px;"></span>
+          <span class="card-icon-img">
+            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Star"
+              style="width:16px;height:16px;">
+          </span>
           <span>Best Seller</span>
         </div>
         <div class="hero-floating-card card-2">
           <span>Lip Kit</span>
-          <span class="card-price">٢٩٠ ر.س</span>
+          <span class="card-price">٢٩٠ ج.م</span>
         </div>
+
+        <!-- Deco shapes -->
         <div class="hero-shape s1"></div>
         <div class="hero-shape s2"></div>
         <div class="hero-shape s3"></div>
       </div>
+
+      <!-- Side trust strip -->
+      <div class="hero-trust">
+        <span>✦ جودة مضمونة</span>
+        <span>✦ شحن مجاني فوق ٥٠٠ ج.م</span>
+        <span>✦ إرجاع مجاني</span>
+      </div>
     </div>
 
+    <!-- Scroll hint -->
     <div class="hero-scroll">
       <span>مرري للأسفل</span>
       <div class="scroll-line"></div>
     </div>
 
+    <!-- Bottom Marquee -->
     <div class="hero-marquee">
       <div class="marquee-track">
-        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · </span>
-        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · </span>
-        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · </span>
+        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · Skincare · Accessories · </span>
+        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · Skincare · Accessories · </span>
+        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · Skincare · Accessories · </span>
       </div>
     </div>
   </section>
+
 
   <!-- Categories Section -->
   <section class="categories section">
@@ -140,7 +210,8 @@
         <div class="cat-card cat-makeup" data-reveal data-category-slug="makeup">
           <div class="cat-card-bg"></div>
           <div class="cat-card-content">
-            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3557/3557605.png" alt="Makeup" style="width:40px;"></div>
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3557/3557605.png" alt="Makeup"
+                style="width:40px;"></div>
             <h3>ميك أب</h3>
             <p>أحمر شفاه · بودرة · عيون · بشرة</p>
             <a href="makeup.html" class="cat-link">تسوقي <span>→</span></a>
@@ -153,7 +224,8 @@
         <div class="cat-card cat-fashion" data-reveal data-category-slug="fashion">
           <div class="cat-card-bg"></div>
           <div class="cat-card-content">
-            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3159/3159620.png" alt="Fashion" style="width:40px;"></div>
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3159/3159620.png" alt="Fashion"
+                style="width:40px;"></div>
             <h3>أزياء</h3>
             <p>فساتين · عبايات · إكسسوارات</p>
             <a href="fashion.html" class="cat-link">تسوقي <span>→</span></a>
@@ -166,7 +238,8 @@
         <div class="cat-card cat-skincare" data-reveal data-category-slug="skincare">
           <div class="cat-card-bg"></div>
           <div class="cat-card-content">
-            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1764/1764708.png" alt="Skincare" style="width:40px;"></div>
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1764/1764708.png" alt="Skincare"
+                style="width:40px;"></div>
             <h3>العناية بالبشرة</h3>
             <p>سيروم · مرطب · كريم · ماسك</p>
             <a href="skincare.html" class="cat-link">تسوقي <span>→</span></a>
@@ -179,7 +252,8 @@
         <div class="cat-card cat-accessories" data-reveal data-category-slug="accessories">
           <div class="cat-card-bg"></div>
           <div class="cat-card-content">
-            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1251/1251415.png" alt="Accessories" style="width:40px;"></div>
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1251/1251415.png"
+                alt="Accessories" style="width:40px;"></div>
             <h3>إكسسوارات</h3>
             <p>حقائب · مجوهرات · نظارات</p>
             <a href="accessories.html" class="cat-link">تسوقي <span>→</span></a>
@@ -224,7 +298,7 @@
       <div class="campaign-text" data-reveal>
         <span class="section-tag light">مجموعة الصيف ٢٠٢٥</span>
         <h2 class="campaign-title">
-          صيف من<br/><em>الألوان</em>
+          صيف من<br /><em>الألوان</em>
         </h2>
         <p>أحمر شفاه جرئ · ظلال عيون نابضة · فساتين الصيف المميزة</p>
         <a href="collections.html" class="btn-light">اكتشفي الآن</a>
@@ -293,12 +367,24 @@
         <h2 class="section-title">@yokastore <em>على انستقرام</em></h2>
       </div>
       <div class="social-grid" data-reveal>
-        <div class="social-item si1"><div class="si-overlay"><span>♡ 2.4k</span></div></div>
-        <div class="social-item si2"><div class="si-overlay"><span>♡ 1.8k</span></div></div>
-        <div class="social-item si3"><div class="si-overlay"><span>♡ 3.1k</span></div></div>
-        <div class="social-item si4"><div class="si-overlay"><span>♡ 980</span></div></div>
-        <div class="social-item si5"><div class="si-overlay"><span>♡ 2.2k</span></div></div>
-        <div class="social-item si6"><div class="si-overlay"><span>♡ 4.5k</span></div></div>
+        <div class="social-item si1">
+          <div class="si-overlay"><span>♡ 2.4k</span></div>
+        </div>
+        <div class="social-item si2">
+          <div class="si-overlay"><span>♡ 1.8k</span></div>
+        </div>
+        <div class="social-item si3">
+          <div class="si-overlay"><span>♡ 3.1k</span></div>
+        </div>
+        <div class="social-item si4">
+          <div class="si-overlay"><span>♡ 980</span></div>
+        </div>
+        <div class="social-item si5">
+          <div class="si-overlay"><span>♡ 2.2k</span></div>
+        </div>
+        <div class="social-item si6">
+          <div class="si-overlay"><span>♡ 4.5k</span></div>
+        </div>
       </div>
     </div>
   </section>
@@ -310,7 +396,7 @@
         <div class="nl-deco nl-deco-1">✦</div>
         <div class="nl-deco nl-deco-2">✦</div>
         <span class="section-tag">النشرة البريدية</span>
-        <h2 class="newsletter-title">كوني أول من تعرف<br/><em>عن عروضنا</em></h2>
+        <h2 class="newsletter-title">كوني أول من تعرف<br /><em>عن عروضنا</em></h2>
         <p>اشتركي واحصلي على خصم ١٥٪ على أول طلب</p>
         <form class="nl-form" onsubmit="handleNewsletter(event)">
           <input type="email" placeholder="بريدك الإلكتروني" class="nl-input" required />
@@ -329,7 +415,7 @@
           <a href="index.html" class="footer-logo">
             <span class="logo-y">Y</span>oka
           </a>
-          <p>متجرك المفضل للجمال والأزياء الراقية.<br/>جودة لا تُقبل بأقل منها.</p>
+          <p>متجرك المفضل للجمال والأزياء الراقية.<br />جودة لا تُقبل بأقل منها.</p>
           <div class="footer-socials">
             <a href="#" class="social-link">Instagram</a>
             <a href="#" class="social-link">TikTok</a>
@@ -395,4 +481,5 @@
   <!-- Cart Manager must be loaded after main script -->
   <script src="cart-manager.js"></script>
 </body>
+
 </html>

@@ -156,19 +156,136 @@ document.addEventListener('DOMContentLoaded', () => {
   initModal();
   initToast();
   initTestimonialsDots();
-  loadHeroBgImageFromSettings();
+  loadSiteSettings();
+  loadCategoriesAndCounts();
 });
 
-// ─── Hero image from site_settings (لوحة التحكم) ─────
-async function loadHeroBgImageFromSettings() {
-  if (!document.querySelector('.hero-image-bg')) return;
+// ─── Site Settings from Supabase ─────────────────────
+async function loadSiteSettings() {
   if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') return;
   try {
-    const { data, error } = await window.supabaseClient.from('site_settings').select('value').eq('key', 'hero_bg_image').single();
-    if (!error && data && data.value && data.value.trim()) {
-      document.documentElement.style.setProperty('--hero-bg-image', `url(${data.value.trim()})`);
+    const { data, error } = await window.supabaseClient.from('site_settings').select('*');
+    if (error) throw error;
+
+    (data || []).forEach(item => {
+      const { key, value } = item;
+
+      // Hero Settings
+      if (key === 'hero_home_bg' && value && value.trim()) {
+        document.documentElement.style.setProperty('--hero-bg-image', `url(${value.trim()})`);
+        const heroEl = document.getElementById('hero');
+        if (heroEl) heroEl.classList.add('has-bg-image');
+      }
+      if (key === 'hero_blob_image' && value && value.trim()) {
+        document.documentElement.style.setProperty('--hero-blob-image', `url(${value.trim()})`);
+      }
+      if (key === 'hero_home_color' && value) {
+        document.documentElement.style.setProperty('--hero-bg-color', value);
+      }
+      if (key === 'hero_shop_bg' && value && value.trim()) {
+        document.documentElement.style.setProperty('--page-hero-bg-image', `url(${value.trim()})`);
+        document.querySelector('.page-hero')?.classList.add('has-bg-image');
+      }
+
+      // Category Heroes (Makeup, Fashion, etc.)
+      const currentCat = document.body.dataset.category;
+      if (currentCat && key === `hero_cat_${currentCat}` && value && value.trim()) {
+        document.documentElement.style.setProperty('--page-hero-bg-image', `url(${value.trim()})`);
+        document.querySelector('.page-hero')?.classList.add('has-bg-image');
+      }
+
+      // Campaign Settings
+      if (key === 'camp_tag' && value) {
+        const el = document.querySelector('.campaign .section-tag');
+        if (el) el.textContent = value;
+      }
+      if (key === 'camp_title' && value) {
+        const el = document.querySelector('.campaign-title');
+        if (el) el.innerHTML = value;
+      }
+      if (key === 'camp_desc' && value) {
+        const el = document.querySelector('.campaign-text p');
+        if (el) el.textContent = value;
+      }
+      if (key === 'camp_bg' && value) {
+        const el = document.querySelector('.campaign-inner');
+        if (el) el.style.backgroundColor = value;
+      }
+      if (key === 'camp_bg_image' && value && value.trim()) {
+        document.documentElement.style.setProperty('--campaign-bg-image', `url(${value.trim()})`);
+        const el = document.querySelector('.campaign');
+        if (el) el.classList.add('has-bg-image');
+      }
+
+      // Site Colors
+      if (key === 'color_rose' && value) document.documentElement.style.setProperty('--rose', value);
+      if (key === 'color_gold' && value) document.documentElement.style.setProperty('--gold', value);
+      if (key === 'color_text' && value) document.documentElement.style.setProperty('--text-dark', value);
+      if (key === 'color_bg' && value) document.documentElement.style.setProperty('--cream', value);
+
+      // Store Global Info
+      if (key === 'store_name' && value) {
+        document.title = value + ' | ' + (document.title.split('|')[1] || 'متجر يوكا');
+      }
+    });
+  } catch (e) {
+    console.warn('Failed to load site settings:', e);
+  }
+}
+
+// ─── Dynamic Categories & Counts ─────────────────────
+async function loadCategoriesAndCounts() {
+  const container = document.getElementById('categoriesGrid');
+  if (!container) return; // Only on index.html
+
+  if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') return;
+
+  try {
+    // 1. Fetch Categories
+    const { data: cats, error: catError } = await window.supabaseClient
+      .from('categories')
+      .select('*')
+      .order('order', { ascending: true });
+
+    if (catError) throw catError;
+
+    // 2. Fetch Product Counts per Category
+    const { data: counts, error: countError } = await window.supabaseClient
+      .from('products')
+      .select('category_id')
+      .eq('is_active', true);
+
+    if (countError) throw countError;
+
+    const countMap = {};
+    (counts || []).forEach(p => {
+      if (p.category_id) countMap[p.category_id] = (countMap[p.category_id] || 0) + 1;
+    });
+
+    // 3. Render Categories
+    if (cats && cats.length > 0) {
+      container.innerHTML = cats.map((cat, i) => `
+        <div class="cat-card" data-reveal data-category-slug="${cat.slug}" style="transition-delay: ${i * 0.1}s">
+          <div class="cat-card-bg" style="background-image: url('${cat.image_url || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop'}')"></div>
+          <div class="cat-card-content">
+            <h3>${cat.name}</h3>
+            <p>${cat.description || ''}</p>
+            <a href="shop.html?category=${cat.slug}" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+${countMap[cat.id] || 0} منتج</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Re-trigger reveal animations for new items
+      setTimeout(() => {
+        container.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('revealed'));
+      }, 50);
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    console.error('Failed to load categories:', e);
+  }
 }
 
 // ─── Load Products from Supabase ──────────────────────────
@@ -333,20 +450,24 @@ function renderProducts(products) {
   grid.innerHTML = products.map(p => `
     <div class="product-card" data-category="${p.category}" data-id="${p.id}">
       <div class="product-card-img">
-        <img src="${p.image}" alt="${p.name}" class="product-img">
+        <a href="product.html?id=${p.id}">
+          <img src="${p.image}" alt="${p.name}" class="product-img">
+        </a>
         ${p.badge ? `<span class="product-card-badge ${p.badgeType}">${p.badge}</span>` : ''}
         <div class="product-card-actions">
-          <button class="product-card-action-btn" onclick="openQuickView(${safeId(p.id)})">عرض سريع</button>
-          <button class="product-card-action-btn" onclick="addToCart(${safeId(p.id)})">أضف للسلة</button>
-          <button class="product-card-action-btn wishlist-btn" onclick="addToWishlist(${safeId(p.id)})" aria-label="Wishlist">♡</button>
+          <button class="product-card-action-btn" onclick="openQuickView('${p.id}')">عرض سريع</button>
+          <button class="product-card-action-btn" onclick="addToCart('${p.id}')">أضف للسلة</button>
+          <button class="product-card-action-btn wishlist-btn" onclick="addToWishlist('${p.id}')">♡</button>
         </div>
       </div>
       <div class="product-card-info">
         <div class="product-card-brand">${p.brand}</div>
-        <div class="product-card-name">${p.name}</div>
+        <a href="product.html?id=${p.id}" class="product-card-link">
+          <div class="product-card-name">${p.name}</div>
+        </a>
         <div class="product-card-price">
-          <span class="price-current">${p.price} ر.س</span>
-          ${p.oldPrice ? `<span class="price-old">${p.oldPrice} ر.س</span>` : ''}
+          <span class="price-current">${p.price} ج.م</span>
+          ${p.oldPrice ? `<span class="price-old">${p.oldPrice} ج.م</span>` : ''}
         </div>
         <div class="product-card-rating">
           <span class="stars">${'★'.repeat(p.rating)}${'☆'.repeat(5 - p.rating)}</span>
@@ -436,8 +557,8 @@ function openQuickView(id) {
         <div class="product-card-brand">${product.brand}</div>
         <div class="product-card-name">${product.name}</div>
         <div class="product-card-price">
-          <span class="price-current">${product.price} ر.س</span>
-          ${product.oldPrice ? `<span class="price-old">${product.oldPrice} ر.س</span>` : ''}
+          <span class="price-current">${product.price} ج.م</span>
+          ${product.oldPrice ? `<span class="price-old">${product.oldPrice} ج.م</span>` : ''}
         </div>
         <div class="product-card-rating">
           <span class="stars">${'★'.repeat(product.rating)}</span>
