@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التوريدات - فوكس بيزنيس</title>
+    <link rel="stylesheet" href="modern-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .deposits-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .deposit-form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-method {
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+        
+        .payment-method.selected {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+        
+        .payment-method i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .deposits-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .deposits-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .deposits-table th {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: right;
+        }
+        
+        .deposits-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: right;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .agent-info {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .agent-info h2 {
+            margin: 0 0 10px 0;
+        }
+        
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="deposits-container">
+        <!-- Agent Info -->
+        <div class="agent-info">
+            <h2>مرحباً: <span id="agentName">...</span></h2>
+            <div class="balance">الرصيد الحالي: <span id="agentBalance">0</span> ج.م</div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalDeposits">0 ج.م</div>
+                <div class="stat-label">إجمالي التوريدات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingDeposits">0 ج.م</div>
+                <div class="stat-label">في انتظار الموافقة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="approvedDeposits">0 ج.م</div>
+                <div class="stat-label">التوريدات الموافق عليها</div>
+            </div>
+        </div>
+
+        <!-- Deposit Form -->
+        <div class="deposit-form-card">
+            <h3 style="margin-bottom: 25px; text-align: center; color: #333;">توريد جديد</h3>
+            <form id="depositForm">
+                <div class="form-group">
+                    <label for="amountInput">المبلغ *</label>
+                    <input type="number" id="amountInput" class="form-control" placeholder="أدخل المبلغ" step="0.01" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>طريقة الدفع *</label>
+                    <div class="payment-methods">
+                        <div class="payment-method" data-method="cash">
+                            <i class="fas fa-money-bill"></i>
+                            <span>نقدي</span>
+                        </div>
+                        <div class="payment-method" data-method="instapay">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>انستا باي</span>
+                        </div>
+                        <div class="payment-method" data-method="wallet">
+                            <i class="fas fa-wallet"></i>
+                            <span>محفظة إلكترونية</span>
+                        </div>
+                        <div class="payment-method" data-method="bank">
+                            <i class="fas fa-university"></i>
+                            <span>تحويل بنكي</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="paymentMethod" name="paymentMethod" required>
+                </div>
+
+                <div class="form-group" id="transactionField" style="display: none;">
+                    <label for="transactionNumber">رقم المعاملة *</label>
+                    <input type="text" id="transactionNumber" class="form-control" placeholder="أدخل رقم المعاملة">
+                </div>
+
+                <div class="form-group">
+                    <label for="notesInput">ملاحظات</label>
+                    <textarea id="notesInput" class="form-control" rows="3" placeholder="أي ملاحظات إضافية"></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%;" disabled>
+                    <i class="fas fa-paper-plane"></i>
+            إرسال التوريد
+                </button>
+            </form>
+        </div>
+
+        <!-- Deposits History -->
+        <div class="deposits-table">
+            <h3 style="padding: 20px; margin: 0; background: #f8f9fa; text-align: center;">سجل التوريدات</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>المبلغ</th>
+                        <th>طريقة الدفع</th>
+                        <th>رقم المعاملة</th>
+                        <th>الحالة</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody id="depositsTableBody">
+                    <tr><td colspan="6" style="text-align: center; padding: 20px;">جاري التحميل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="deposits-script.js"></script>
+</body>
+</html>

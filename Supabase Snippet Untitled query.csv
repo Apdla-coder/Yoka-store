@@ -1,0 +1,116 @@
+section,table_name,column_name,data_type,is_nullable,column_default,constraint_type,foreign_table,foreign_column
+=== TABLES ===,null,null,null,null,null,null,null,null
+FOREIGN KEY,agent_locations,agent_id,null,null,null,FOREIGN KEY,agents,id
+FOREIGN KEY,agent_notes,agent_id,null,null,null,FOREIGN KEY,agents,id
+FOREIGN KEY,collections,collected_by,null,null,null,FOREIGN KEY,agents,id
+FOREIGN KEY,collections,customer_id,null,null,null,FOREIGN KEY,customers,id
+FOREIGN KEY,customers,agent_id,null,null,null,FOREIGN KEY,agents,id
+FOREIGN KEY,login_logs,agent_id,null,null,null,FOREIGN KEY,agents,id
+FOREIGN KEY,stop_requests,agent_id,null,null,null,FOREIGN KEY,agents,id
+FOREIGN KEY,stop_requests,customer_id,null,null,null,FOREIGN KEY,customers,id
+INDEX,agent_locations,agent_locations_pkey,CREATE UNIQUE INDEX agent_locations_pkey ON public.agent_locations USING btree (id),null,null,INDEX,null,null
+INDEX,agent_locations,idx_agent_locations_agent_id,CREATE INDEX idx_agent_locations_agent_id ON public.agent_locations USING btree (agent_id),null,null,INDEX,null,null
+INDEX,agent_locations,idx_agent_locations_created_at,CREATE INDEX idx_agent_locations_created_at ON public.agent_locations USING btree (created_at),null,null,INDEX,null,null
+INDEX,agent_notes,agent_notes_agent_id_customer_phone_key,"CREATE UNIQUE INDEX agent_notes_agent_id_customer_phone_key ON public.agent_notes USING btree (agent_id, customer_phone)",null,null,INDEX,null,null
+INDEX,agent_notes,agent_notes_pkey,CREATE UNIQUE INDEX agent_notes_pkey ON public.agent_notes USING btree (id),null,null,INDEX,null,null
+INDEX,agent_notes,idx_agent_notes_agent_id,CREATE INDEX idx_agent_notes_agent_id ON public.agent_notes USING btree (agent_id),null,null,INDEX,null,null
+INDEX,agent_notes,idx_agent_notes_customer_phone,CREATE INDEX idx_agent_notes_customer_phone ON public.agent_notes USING btree (customer_phone),null,null,INDEX,null,null
+INDEX,agents,agents_pkey,CREATE UNIQUE INDEX agents_pkey ON public.agents USING btree (id),null,null,INDEX,null,null
+INDEX,agents,idx_agents_phone,CREATE INDEX idx_agents_phone ON public.agents USING btree (phone),null,null,INDEX,null,null
+INDEX,collections,collections_pkey,CREATE UNIQUE INDEX collections_pkey ON public.collections USING btree (id),null,null,INDEX,null,null
+INDEX,collections,idx_collections_collected_by,CREATE INDEX idx_collections_collected_by ON public.collections USING btree (collected_by),null,null,INDEX,null,null
+INDEX,collections,idx_collections_created_at,CREATE INDEX idx_collections_created_at ON public.collections USING btree (created_at),null,null,INDEX,null,null
+INDEX,collections,idx_collections_customer_id,CREATE INDEX idx_collections_customer_id ON public.collections USING btree (customer_id),null,null,INDEX,null,null
+INDEX,customers,customers_pkey,CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (id),null,null,INDEX,null,null
+INDEX,customers,idx_customers_agent_id,CREATE INDEX idx_customers_agent_id ON public.customers USING btree (agent_id),null,null,INDEX,null,null
+INDEX,customers,idx_customers_billing_month,CREATE INDEX idx_customers_billing_month ON public.customers USING btree (billing_month),null,null,INDEX,null,null
+INDEX,customers,idx_customers_collection_status,CREATE INDEX idx_customers_collection_status ON public.customers USING btree (collection_status),null,null,INDEX,null,null
+INDEX,customers,idx_customers_package_type,CREATE INDEX idx_customers_package_type ON public.customers USING btree (package_type),null,null,INDEX,null,null
+INDEX,customers,idx_customers_phone,CREATE INDEX idx_customers_phone ON public.customers USING btree (phone),null,null,INDEX,null,null
+INDEX,customers,idx_customers_section,CREATE INDEX idx_customers_section ON public.customers USING btree (section),null,null,INDEX,null,null
+INDEX,customers,idx_customers_status,CREATE INDEX idx_customers_status ON public.customers USING btree (status),null,null,INDEX,null,null
+INDEX,login_logs,idx_login_logs_agent_id,CREATE INDEX idx_login_logs_agent_id ON public.login_logs USING btree (agent_id),null,null,INDEX,null,null
+INDEX,login_logs,idx_login_logs_login_time,CREATE INDEX idx_login_logs_login_time ON public.login_logs USING btree (login_time),null,null,INDEX,null,null
+INDEX,login_logs,login_logs_pkey,CREATE UNIQUE INDEX login_logs_pkey ON public.login_logs USING btree (id),null,null,INDEX,null,null
+INDEX,stop_requests,idx_stop_requests_agent_id,CREATE INDEX idx_stop_requests_agent_id ON public.stop_requests USING btree (agent_id),null,null,INDEX,null,null
+INDEX,stop_requests,idx_stop_requests_customer_id,CREATE INDEX idx_stop_requests_customer_id ON public.stop_requests USING btree (customer_id),null,null,INDEX,null,null
+INDEX,stop_requests,stop_requests_pkey,CREATE UNIQUE INDEX stop_requests_pkey ON public.stop_requests USING btree (id),null,null,INDEX,null,null
+PRIMARY KEY,agent_locations,id,null,null,null,PRIMARY KEY,null,null
+PRIMARY KEY,agent_notes,id,null,null,null,PRIMARY KEY,null,null
+PRIMARY KEY,agents,id,null,null,null,PRIMARY KEY,null,null
+PRIMARY KEY,collections,id,null,null,null,PRIMARY KEY,null,null
+PRIMARY KEY,customers,id,null,null,null,PRIMARY KEY,null,null
+PRIMARY KEY,login_logs,id,null,null,null,PRIMARY KEY,null,null
+PRIMARY KEY,stop_requests,id,null,null,null,PRIMARY KEY,null,null
+TABLE,agent_locations,agent_id,uuid,YES,null,null,null,null
+TABLE,agent_locations,created_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,agent_locations,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,agent_locations,latitude,numeric,YES,null,null,null,null
+TABLE,agent_locations,longitude,numeric,YES,null,null,null,null
+TABLE,agent_notes,agent_id,uuid,YES,null,null,null,null
+TABLE,agent_notes,created_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,agent_notes,customer_name,text,NO,null,null,null,null
+TABLE,agent_notes,customer_phone,text,NO,null,null,null,null
+TABLE,agent_notes,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,agent_notes,note_text,text,NO,null,null,null,null
+TABLE,agent_notes,updated_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,agent_performance,agent_id,uuid,YES,null,null,null,null
+TABLE,agent_performance,agent_name,text,YES,null,null,null,null
+TABLE,agent_performance,collected_customers,bigint,YES,null,null,null,null
+TABLE,agent_performance,stop_requests_count,bigint,YES,null,null,null,null
+TABLE,agent_performance,total_collected,numeric,YES,null,null,null,null
+TABLE,agent_performance,total_customers,bigint,YES,null,null,null,null
+TABLE,agent_performance,total_due,numeric,YES,null,null,null,null
+TABLE,agents,created_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,agents,email,text,NO,null,null,null,null
+TABLE,agents,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,agents,name,text,NO,null,null,null,null
+TABLE,agents,password,text,NO,null,null,null,null
+TABLE,agents,phone,text,YES,null,null,null,null
+TABLE,agents,role,text,YES,null,null,null,null
+TABLE,agents,updated_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,collection_summary,agent_name,text,YES,null,null,null,null
+TABLE,collection_summary,amount,numeric,YES,null,null,null,null
+TABLE,collection_summary,collection_date,timestamp with time zone,YES,null,null,null,null
+TABLE,collection_summary,customer_name,text,YES,null,null,null,null
+TABLE,collection_summary,customer_phone,text,YES,null,null,null,null
+TABLE,collection_summary,id,uuid,YES,null,null,null,null
+TABLE,collections,amount,numeric,NO,null,null,null,null
+TABLE,collections,collected_by,uuid,YES,null,null,null,null
+TABLE,collections,created_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,collections,customer_id,uuid,YES,null,null,null,null
+TABLE,collections,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,customer_summary,address,text,YES,null,null,null,null
+TABLE,customer_summary,agent_name,text,YES,null,null,null,null
+TABLE,customer_summary,billing_month,text,YES,null,null,null,null
+TABLE,customer_summary,collection_status,text,YES,null,null,null,null
+TABLE,customer_summary,created_at,timestamp with time zone,YES,null,null,null,null
+TABLE,customer_summary,due_amount,numeric,YES,null,null,null,null
+TABLE,customer_summary,id,uuid,YES,null,null,null,null
+TABLE,customer_summary,name,text,YES,null,null,null,null
+TABLE,customer_summary,phone,text,YES,null,null,null,null
+TABLE,customer_summary,section,text,YES,null,null,null,null
+TABLE,customers,address,text,YES,null,null,null,null
+TABLE,customers,agent_id,uuid,YES,null,null,null,null
+TABLE,customers,billing_month,text,YES,null,null,null,null
+TABLE,customers,collection_status,text,YES,null,null,null,null
+TABLE,customers,created_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,customers,debt_amount,numeric,YES,0,null,null,null
+TABLE,customers,due_amount,numeric,NO,0,null,null,null
+TABLE,customers,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,customers,name,text,NO,null,null,null,null
+TABLE,customers,package_type,text,YES,null,null,null,null
+TABLE,customers,phone,text,NO,null,null,null,null
+TABLE,customers,section,text,YES,null,null,null,null
+TABLE,customers,status,text,YES,'لم يتم التحصيل'::text,null,null,null
+TABLE,customers,updated_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,login_logs,agent_id,uuid,YES,null,null,null,null
+TABLE,login_logs,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,login_logs,login_time,timestamp with time zone,YES,now(),null,null,null
+TABLE,stop_requests,agent_id,uuid,YES,null,null,null,null
+TABLE,stop_requests,created_at,timestamp with time zone,YES,now(),null,null,null
+TABLE,stop_requests,customer_id,uuid,YES,null,null,null,null
+TABLE,stop_requests,customer_name,text,NO,null,null,null,null
+TABLE,stop_requests,customer_phone,text,NO,null,null,null,null
+TABLE,stop_requests,id,uuid,NO,gen_random_uuid(),null,null,null
+TABLE,stop_requests,reason,text,YES,null,null,null,null

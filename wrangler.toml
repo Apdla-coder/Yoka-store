@@ -1,0 +1,4 @@
+name = "fox-business"
+compatibility_date = "2024-02-08"
+
+pages_build_output_dir = "."

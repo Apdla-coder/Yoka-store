@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <title>لوحة التحكم - فوكس بيزنيس</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="2; url=admin-dashboard.html" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="فوكس بيزنيس" />
+    <meta name="application-name" content="فوكس بيزنيس" />
+    <meta name="description" content="نظام متقدم لإدارة التحصيل والمتابعة العملاء" />
+    <meta name="msapplication-TileColor" content="#2c3e50" />
+    <meta name="msapplication-config" content="./browserconfig.xml" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="./Orange_logo.svg.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./Orange_logo.svg.png" />
+    
+    <!-- Modern CSS Framework -->
+    <link rel="stylesheet" href="./modern-styles.css">
+    
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .redirect-message {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+        
+        .redirect-message h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .redirect-message p {
+            color: #7f8c8d;
+            margin: 0.5rem 0 0 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-message">
+        <h1>🎯 لوحة التحكم</h1>
+        <p>جاري التوجيه إلى لوحة التحكم الرئيسية...</p>
+        <div class="spinner"></div>
+    </div>
+</body>
+</html>
