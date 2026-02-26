@@ -1,7 +1,7 @@
 // Cart Manager - Handles cart operations with Supabase and localStorage
 class CartManager {
   constructor() {
-    this.cart = null;
+    this.cart = { items: [] };  // تهيئة فورية — لا null
     this.user = null;
     this.init();
   }
@@ -24,14 +24,14 @@ class CartManager {
 
     // Check if user is logged in
     await this.checkUserAuth();
-    
+
     // Load cart
     if (this.user) {
       await this.loadCartFromSupabase();
     } else {
       this.loadCartFromLocalStorage();
     }
-    
+
     // Update cart badge
     this.updateCartBadge();
   }
@@ -43,7 +43,7 @@ class CartManager {
         this.user = null;
         return;
       }
-      
+
       const { data: { user } } = await window.supabaseClient.auth.getUser();
       this.user = user;
     } catch (error) {
@@ -137,18 +137,29 @@ class CartManager {
   // Add item to cart
   async addToCart(productId, quantity = 1) {
     try {
+      // التأكد من تهيئة السلة
+      if (!this.cart) this.cart = { items: [] };
+
       // Get product details
-      const product = window.PRODUCTS?.find(p => p.id === productId);
+      let product = window.PRODUCTS?.find(p => p.id === productId);
+
+      // إذا لم يوجد في window.PRODUCTS، حاول من Supabase مباشرة
+      if (!product && window.supabaseClient) {
+        try {
+          const { data } = await window.supabaseClient
+            .from('products').select('id, name, image_url, price').eq('id', productId).single();
+          if (data) product = { id: data.id, name: data.name, image: data.image_url, price: data.price };
+        } catch (e) { /* ignored */ }
+      }
+
       if (!product) {
         console.error('Product not found:', productId);
         return false;
       }
 
       if (this.user) {
-        // Add to Supabase cart
         await this.addToSupabaseCart(productId, quantity, product);
       } else {
-        // Add to localStorage cart
         this.addToLocalStorageCart(productId, quantity, product);
       }
 
@@ -166,7 +177,7 @@ class CartManager {
   async addToSupabaseCart(productId, quantity, product) {
     // Check if item already exists in cart
     const existingItem = this.cart.items.find(item => item.productId === productId);
-    
+
     if (existingItem) {
       // Update quantity
       const { error } = await window.supabaseClient
@@ -204,20 +215,21 @@ class CartManager {
 
   // Add to localStorage cart
   addToLocalStorageCart(productId, quantity, product) {
+    if (!this.cart || !Array.isArray(this.cart.items)) this.cart = { items: [] };
     const existingItem = this.cart.items.find(item => item.productId === productId);
-    
+
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
       this.cart.items.push({
         productId: productId,
         name: product.name,
-        image: product.image,
+        image: product.image || product.image_url || '',
         price: product.price,
         quantity: quantity
       });
     }
-    
+
     this.saveCartToLocalStorage();
   }
 
@@ -230,7 +242,8 @@ class CartManager {
   updateCartBadge() {
     const badge = document.querySelector('.cart-badge');
     if (badge) {
-      const totalItems = this.cart.items.reduce((sum, item) => sum + item.quantity, 0);
+      const items = this.cart?.items || [];
+      const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
       badge.textContent = totalItems;
       badge.style.transform = 'scale(1.5)';
       setTimeout(() => badge.style.transform = '', 300);
@@ -239,7 +252,8 @@ class CartManager {
 
   // Get cart total
   getCartTotal() {
-    return this.cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const items = this.cart?.items || [];
+    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   }
 
   // Remove item from cart
@@ -254,13 +268,13 @@ class CartManager {
             .eq('id', item.id);
         }
       }
-      
+
       this.cart.items = this.cart.items.filter(item => item.productId !== productId);
-      
+
       if (!this.user) {
         this.saveCartToLocalStorage();
       }
-      
+
       this.updateCartBadge();
       return true;
     } catch (error) {
@@ -285,16 +299,16 @@ class CartManager {
             .eq('id', item.id);
         }
       }
-      
+
       const item = this.cart.items.find(item => item.productId === productId);
       if (item) {
         item.quantity = quantity;
       }
-      
+
       if (!this.user) {
         this.saveCartToLocalStorage();
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -311,13 +325,13 @@ class CartManager {
           .delete()
           .eq('cart_id', this.cart.id);
       }
-      
+
       this.cart.items = [];
-      
+
       if (!this.user) {
         this.saveCartToLocalStorage();
       }
-      
+
       this.updateCartBadge();
     } catch (error) {
       console.error('Error clearing cart:', error);
@@ -326,7 +340,7 @@ class CartManager {
 
   // Get cart items
   getCartItems() {
-    return this.cart.items;
+    return this.cart?.items || [];
   }
 }
 

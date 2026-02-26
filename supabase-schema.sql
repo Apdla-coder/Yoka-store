@@ -24,12 +24,16 @@ CREATE TABLE IF NOT EXISTS public.categories (
   slug       TEXT NOT NULL UNIQUE,
   "order"    SMALLINT NOT NULL DEFAULT 0,
   is_active  BOOLEAN NOT NULL DEFAULT true,
+  image_url  TEXT,
+  description TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Ensure column exists if table was created earlier without it
+-- Ensure columns exist if table was created earlier without them
 ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS image_url TEXT;
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS description TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_categories_slug ON public.categories(slug);
 CREATE INDEX IF NOT EXISTS idx_categories_is_active ON public.categories(is_active);
@@ -228,14 +232,16 @@ DROP POLICY IF EXISTS "Allow public read categories for anon" ON public.categori
 -- ─────────────────────────────────────────────────────────────────────────────
 -- SEED: Categories
 -- ─────────────────────────────────────────────────────────────────────────────
-INSERT INTO public.categories (name, slug, "order") VALUES
-  ('ميك أب', 'makeup', 1),
-  ('أزياء', 'fashion', 2),
-  ('العناية بالبشرة', 'skincare', 3),
-  ('إكسسوارات', 'accessories', 4)
+INSERT INTO public.categories (name, slug, "order", image_url, description) VALUES
+  ('ميك أب', 'makeup', 1, 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop', 'أحمر شفاه · بودرة · عيون · بشرة'),
+  ('أزياء', 'fashion', 2, 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop', 'فساتين · عبايات · إكسسوارات'),
+  ('العناية بالبشرة', 'skincare', 3, 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=800&auto=format&fit=crop', 'سيروم · مرطب · كريم · ماسك'),
+  ('إكسسوارات', 'accessories', 4, 'https://images.unsplash.com/photo-1535633302723-99e393142281?q=80&w=800&auto=format&fit=crop', 'حقائب · مجوهرات · نظارات')
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   "order" = EXCLUDED."order",
+  image_url = EXCLUDED.image_url,
+  description = EXCLUDED.description,
   updated_at = now();
 
 -- ─────────────────────────────────────────────────────────────────────────────

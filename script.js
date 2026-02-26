@@ -151,13 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initMobileMenu();
   initRevealAnimations();
-  loadProductsFromSupabase(); // Load products from Supabase
-  initFilters();
   initModal();
   initToast();
   initTestimonialsDots();
-  loadSiteSettings();
-  loadCategoriesAndCounts();
+  initHeroSlider();
+
+  // Parallelize data fetching
+  Promise.all([
+    loadSiteSettings(),
+    loadCategoriesAndCounts(),
+    loadProductsFromSupabase()
+  ]).catch(err => console.error('Data initialization error:', err));
 });
 
 // ─── Site Settings from Supabase ─────────────────────
@@ -170,21 +174,33 @@ async function loadSiteSettings() {
     (data || []).forEach(item => {
       const { key, value } = item;
 
-      // Hero Settings
-      if (key === 'hero_home_bg' && value && value.trim()) {
+      // Hero Slider Settings
+      if (key.startsWith('hero_slide_') && value && value.trim()) {
+        const slideIndex = parseInt(key.split('_')[2]) - 1;
+        const slides = document.querySelectorAll('.hero-slide img');
+        if (slides[slideIndex]) {
+          slides[slideIndex].src = value.trim();
+        }
+      }
+      if (key === 'hero_bg_image' && value && value.trim()) {
         document.documentElement.style.setProperty('--hero-bg-image', `url(${value.trim()})`);
-        const heroEl = document.getElementById('hero');
-        if (heroEl) heroEl.classList.add('has-bg-image');
+        document.querySelector('.hero')?.classList.add('has-bg-image');
       }
-      if (key === 'hero_blob_image' && value && value.trim()) {
-        document.documentElement.style.setProperty('--hero-blob-image', `url(${value.trim()})`);
-      }
-      if (key === 'hero_home_color' && value) {
-        document.documentElement.style.setProperty('--hero-bg-color', value);
-      }
+
       if (key === 'hero_shop_bg' && value && value.trim()) {
         document.documentElement.style.setProperty('--page-hero-bg-image', `url(${value.trim()})`);
         document.querySelector('.page-hero')?.classList.add('has-bg-image');
+      }
+
+      // Social Grid Images
+      if (key.startsWith('social_img_') && value && value.trim()) {
+        const index = key.split('_')[2];
+        const el = document.getElementById('social-item-' + index);
+        if (el) {
+          el.style.backgroundImage = `url(${value.trim()})`;
+          el.style.backgroundSize = 'cover';
+          el.style.backgroundPosition = 'center';
+        }
       }
 
       // Category Heroes (Makeup, Fashion, etc.)
@@ -226,6 +242,28 @@ async function loadSiteSettings() {
       // Store Global Info
       if (key === 'store_name' && value) {
         document.title = value + ' | ' + (document.title.split('|')[1] || 'متجر يوكا');
+      }
+
+      // Social Links
+      if (key === 'social_ig' && value) {
+        const handle = value.startsWith('@') ? value : '@' + value;
+        const url = 'https://instagram.com/' + (value.startsWith('@') ? value.slice(1) : value);
+        const handleEl = document.getElementById('social-section-handle');
+        const linkEl = document.getElementById('social-section-link');
+        const footerEl = document.getElementById('footer-social-ig');
+        if (handleEl) handleEl.textContent = handle;
+        if (linkEl) linkEl.href = url;
+        if (footerEl) footerEl.href = url;
+      }
+      if (key === 'social_tt' && value) {
+        const url = 'https://tiktok.com/' + (value.startsWith('@') ? value : '@' + value);
+        const footerEl = document.getElementById('footer-social-tt');
+        if (footerEl) footerEl.href = url;
+      }
+      if (key === 'social_sc' && value) {
+        const url = 'https://snapchat.com/add/' + value;
+        const footerEl = document.getElementById('footer-social-sc');
+        if (footerEl) footerEl.href = url;
       }
     });
   } catch (e) {
@@ -304,7 +342,8 @@ async function loadProductsFromSupabase() {
         categories!inner(name, slug)
       `)
       .eq('is_active', true)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(12); // Limit home page products
 
     if (error) {
       console.error('Error loading products:', error);
@@ -359,7 +398,7 @@ function initLoader() {
       const el = document.querySelector(`.${cls}`);
       if (el) setTimeout(() => el.classList.add('revealed'), 100 + i * 150);
     });
-  }, 1800);
+  }, 800); // Reduced from 1800ms to 800ms
 }
 
 // ─── Custom Cursor ────────────────────────────
@@ -451,7 +490,7 @@ function renderProducts(products) {
     <div class="product-card" data-category="${p.category}" data-id="${p.id}">
       <div class="product-card-img">
         <a href="product.html?id=${p.id}">
-          <img src="${p.image}" alt="${p.name}" class="product-img">
+          <img src="${p.image}" alt="${p.name}" class="product-img" loading="lazy">
         </a>
         ${p.badge ? `<span class="product-card-badge ${p.badgeType}">${p.badge}</span>` : ''}
         <div class="product-card-actions">
@@ -659,3 +698,62 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+// ─── Hero Visual Slider ─────────────────────
+function initHeroSlider() {
+  const slider = document.getElementById('heroSlider');
+  if (!slider) return;
+
+  const slides = slider.querySelectorAll('.hero-slide');
+  const dots = slider.querySelectorAll('.dot');
+  let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    // Note: We don't necessarily need to remove .active for the transition 
+    // but we keep it for Ken Burns or other perks on the active slide.
+    slides.forEach(s => s.classList.remove('active'));
+    dots.forEach(d => d.classList.remove('active'));
+
+    // Move the slider tray
+    // In RTL (dir="rtl"), moving positive X shifts content to the right, showing slides to the left.
+    slider.style.transform = `translateX(${index * 100}%)`;
+
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+    currentSlide = index;
+  }
+
+  function nextSlide() {
+    let next = (currentSlide + 1) % slides.length;
+    showSlide(next);
+  }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    slideInterval = setInterval(nextSlide, 5000); // 5 seconds
+  }
+
+  function stopAutoSlide() {
+    if (slideInterval) clearInterval(slideInterval);
+  }
+
+  // Dot navigation
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      showSlide(i);
+      startAutoSlide(); // Restart timer on manual click
+    });
+
+    // Custom cursor hover Support
+    const cursor = document.getElementById('cursor');
+    dot.addEventListener('mouseenter', () => cursor?.classList.add('hover'));
+    dot.addEventListener('mouseleave', () => cursor?.classList.remove('hover'));
+  });
+
+  // Pause on hover
+  slider.addEventListener('mouseenter', stopAutoSlide);
+  slider.addEventListener('mouseleave', startAutoSlide);
+
+  // Initialize
+  startAutoSlide();
+}

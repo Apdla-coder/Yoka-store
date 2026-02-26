@@ -7,14 +7,13 @@
   <title>سلة التسوق | Yoka Store</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Supabase Client Configuration -->
   <script src="supabase-client.js"></script>
+  <script src="site-settings.js"></script>
   <style>
     .cart-page {
       padding: 8rem 0 5rem;
@@ -383,7 +382,7 @@
           </div>
           <div class="summary-row">
             <span>رسوم الشحن</span>
-            <span style="color:var(--rose-dark);font-weight:600">مجاني ✓</span>
+            <span id="shippingDisplay" style="color:var(--rose-dark);font-weight:600">—</span>
           </div>
           <div class="summary-row">
             <span>خصم الكود</span>
@@ -397,6 +396,9 @@
           <div class="promo-section">
             <div class="summary-row" style="font-size:.78rem;color:var(--text-mid);padding:0;margin-bottom:.5rem">
               <span>هل لديك كود خصم؟</span>
+              <span id="appliedCouponBadge"
+                style="display:none;font-size:.7rem;color:var(--rose-dark);margin-right:auto">كود مطبّق ✓ <a href="#"
+                  onclick="clearCoupon();return false" style="color:var(--text3)">إلغاء</a></span>
             </div>
             <div class="promo-form">
               <input type="text" class="promo-input" placeholder="أدخلي الكود" id="promoInput" />
@@ -406,11 +408,8 @@
 
           <button class="checkout-btn" id="checkoutBtn" onclick="processCheckout()">إتمام الشراء ←</button>
 
-          <div class="payment-icons">
-            <span class="payment-icon">Visa</span>
-            <span class="payment-icon">Mastercard</span>
-            <span class="payment-icon">Mada</span>
-            <span class="payment-icon">Apple Pay</span>
+          <div class="payment-icons" id="cartPaymentIcons">
+            <!-- ستُعبَّأ ديناميكياً من إعدادات لوحة التحكم -->
           </div>
 
           <div
@@ -431,12 +430,27 @@
   <script>
     // Cart page specific functionality
     document.addEventListener('DOMContentLoaded', async () => {
-      // Wait for cart manager to initialize
       await new Promise(resolve => setTimeout(resolve, 500));
-
+      if (typeof loadSiteSettings === 'function') await loadSiteSettings();
+      renderCartPaymentIcons();
       loadCartItems();
       updateTotals();
     });
+
+    function renderCartPaymentIcons() {
+      const container = document.getElementById('cartPaymentIcons');
+      if (!container) return;
+      const s = window.SITE_SETTINGS || {};
+      const icons = [];
+      if (s.payment_visa !== false) icons.push({ label: 'Visa / مدى', icon: '💳' });
+      if (s.payment_apple !== false) icons.push({ label: 'Apple Pay', icon: '🍎' });
+      if (s.payment_cod !== false) icons.push({ label: 'عند الاستلام', icon: '💵' });
+      if (s.payment_instapay !== false) icons.push({ label: 'انستا باي', icon: '📱' });
+      if (s.payment_ewallet !== false) icons.push({ label: 'محفظة', icon: '👛' });
+      container.innerHTML = icons.map(i =>
+        `<span class="payment-icon" title="${i.label}">${i.icon} ${i.label}</span>`
+      ).join('');
+    }
 
     async function loadCartItems() {
       const container = document.getElementById('cartItemsContainer');
@@ -469,14 +483,14 @@
             <div class="cart-item-brand">Yoka Store</div>
             <div class="cart-item-name">${item.name}</div>
             <div class="cart-item-meta">الكمية: ${item.quantity}</div>
-            <button class="cart-item-remove" onclick="removeCartItem(${item.productId})">✕ حذف</button>
+            <button class="cart-item-remove" onclick="removeCartItem('${item.productId}')">✕ حذف</button>
           </div>
           <div class="cart-item-right">
             <div class="cart-item-price">${item.price} ج.م</div>
             <div class="quantity-control">
-              <button class="qty-btn" onclick="updateItemQuantity(${item.productId}, -1)">−</button>
-              <input class="qty-num" type="number" value="${item.quantity}" min="1" max="10" onchange="setQuantity(${item.productId}, this.value)" />
-              <button class="qty-btn" onclick="updateItemQuantity(${item.productId}, 1)">+</button>
+              <button class="qty-btn" onclick="updateItemQuantity('${item.productId}', -1)">−</button>
+              <input class="qty-num" type="number" value="${item.quantity}" min="1" max="10" onchange="setQuantity('${item.productId}', this.value)" />
+              <button class="qty-btn" onclick="updateItemQuantity('${item.productId}', 1)">+</button>
             </div>
           </div>
         </div>
@@ -524,38 +538,111 @@
     function updateTotals() {
       if (!window.cartManager) return;
 
+      const s = window.SITE_SETTINGS || {};
+      const shippingFee = s.shipping_fee || 25;
+      const freeMin = s.free_shipping_min || 200;
+
       const subtotal = window.cartManager.getCartTotal();
+      const appliedCoupon = JSON.parse(localStorage.getItem('yoka_applied_coupon') || 'null');
+      let discount = 0;
+      if (appliedCoupon) {
+        if (appliedCoupon.type === 'percentage') discount = subtotal * (appliedCoupon.value / 100);
+        else if (appliedCoupon.type === 'fixed') discount = appliedCoupon.value;
+        else if (appliedCoupon.type === 'free_shipping') discount = 0;
+      }
+      const afterDiscount = Math.max(0, subtotal - discount);
+      const shipping = afterDiscount >= freeMin ? 0 : shippingFee;
+      const total = afterDiscount + (appliedCoupon?.type === 'free_shipping' ? 0 : shipping);
+
       document.getElementById('subtotal').textContent = `${subtotal} ج.م`;
-      document.getElementById('total').textContent = `${subtotal} ج.م`;
+      document.getElementById('discount').textContent = discount > 0 || appliedCoupon?.type === 'free_shipping' ? (discount > 0 ? `−${discount.toFixed(0)} ج.م` : 'شحن مجاني') : '—';
+      document.getElementById('discount').style.color = (discount > 0 || appliedCoupon?.type === 'free_shipping') ? 'var(--rose-dark)' : '';
+      document.getElementById('shippingDisplay').textContent = shipping === 0 ? 'مجاني ✓' : `${shipping} ج.م`;
+      document.getElementById('total').textContent = `${total.toFixed(0)} ج.م`;
 
-      // Update free shipping message
-      const freeShippingThreshold = 500;
-      const remaining = freeShippingThreshold - subtotal;
+      const badge = document.getElementById('appliedCouponBadge');
+      if (badge) badge.style.display = appliedCoupon ? 'inline' : 'none';
+
+      const remaining = freeMin - afterDiscount;
       const freeShippingMsg = document.querySelector('.order-summary div[style*="background"]');
-
       if (freeShippingMsg) {
         if (remaining > 0) {
-          freeShippingMsg.innerHTML = `🎁 أضيفي ${remaining} ج.م للحصول على <strong>شحن مجاني + هدية مجانية</strong>`;
+          freeShippingMsg.innerHTML = `🎁 أضيفي ${Math.ceil(remaining)} ج.م للحصول على <strong>شحن مجاني + هدية مجانية</strong>`;
         } else {
           freeShippingMsg.innerHTML = `🎉 <strong>لقد حصلتِ على شحن مجاني!</strong>`;
         }
       }
     }
 
-    function applyPromo() {
+    async function applyPromo() {
       const code = document.getElementById('promoInput').value.trim().toUpperCase();
-      if (code === 'YOKA15') {
-        const subtotal = window.cartManager.getCartTotal();
-        const discount = subtotal * 0.15;
-        const total = subtotal - discount;
+      if (!code) { showToast('أدخلي كود الخصم'); return; }
 
-        document.getElementById('discount').textContent = `−${discount.toFixed(0)} ج.م`;
-        document.getElementById('discount').style.color = 'var(--rose-dark)';
-        document.getElementById('total').textContent = `${total.toFixed(0)} ج.م`;
-        showToast('تم تطبيق الكود! خصم ١٥٪ 🎉');
+      if (window.supabaseClient) {
+        try {
+          const { data: coupon, error } = await window.supabaseClient
+            .from('coupons')
+            .select('*')
+            .eq('code', code)
+            .eq('status', 'active')
+            .single();
+          if (error || !coupon) { showToast('الكود غير صحيح أو منتهي'); return; }
+
+          const subtotal = window.cartManager.getCartTotal();
+          const minOrder = parseFloat(coupon.min_order) || 0;
+          if (subtotal < minOrder) {
+            showToast(`الحد الأدنى للطلب ${minOrder} ج.م`);
+            return;
+          }
+
+          let discount = 0;
+          if (coupon.type === 'percentage') discount = subtotal * (parseFloat(coupon.value) / 100);
+          else if (coupon.type === 'fixed') discount = parseFloat(coupon.value);
+          else if (coupon.type === 'free_shipping') discount = 0;
+
+          const usageLimit = coupon.usage_limit;
+          const usedCount = coupon.used_count || 0;
+          if (usageLimit != null && usedCount >= usageLimit) {
+            showToast('انتهت صلاحية هذا الكود');
+            return;
+          }
+          if (coupon.expiry_date && new Date(coupon.expiry_date) < new Date()) {
+            showToast('انتهت صلاحية هذا الكود');
+            return;
+          }
+
+          localStorage.setItem('yoka_applied_coupon', JSON.stringify({
+            id: coupon.id,
+            code: coupon.code,
+            type: coupon.type,
+            value: parseFloat(coupon.value),
+            min_order: minOrder,
+            discount: discount
+          }));
+          updateTotals();
+          showToast(`تم تطبيق الكود! ${coupon.type === 'percentage' ? coupon.value + '%' : coupon.type === 'fixed' ? coupon.value + ' ج.م' : 'شحن مجاني'} 🎉`);
+        } catch (e) {
+          console.error(e);
+          showToast('حدث خطأ. حاولي مرة أخرى');
+        }
       } else {
-        showToast('الكود غير صحيح. حاولي مرة أخرى');
+        if (code === 'YOKA15') {
+          const subtotal = window.cartManager.getCartTotal();
+          const discount = subtotal * 0.15;
+          localStorage.setItem('yoka_applied_coupon', JSON.stringify({ code, type: 'percentage', value: 15, discount }));
+          updateTotals();
+          showToast('تم تطبيق الكود! خصم ١٥٪ 🎉');
+        } else {
+          showToast('الكود غير صحيح');
+        }
       }
+    }
+
+    function clearCoupon() {
+      localStorage.removeItem('yoka_applied_coupon');
+      document.getElementById('promoInput').value = '';
+      updateTotals();
+      showToast('تم إلغاء الكود');
     }
 
     function processCheckout() {
@@ -566,7 +653,7 @@
 
       setTimeout(() => {
         window.location.href = 'checkout.html';
-      }, 2500);
+      }, 1500);
     }
   </script>
 </body>

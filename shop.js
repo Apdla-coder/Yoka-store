@@ -42,7 +42,7 @@ async function loadShopData() {
           categories!inner(name, slug),
           product_colors(color_hex),
           product_sizes(size)
-        `).eq('is_active', true).order('created_at', { ascending: false })
+        `).eq('is_active', true).order('created_at', { ascending: false }).limit(24) // Initial limit for faster load
       ]);
 
       if (!catRes.error) SHOP.categories = catRes.data || [];
@@ -222,7 +222,7 @@ function renderProducts() {
       <div class="product-card" data-id="${p.id}">
         <div class="product-card-img">
           <a href="product.html?id=${p.id}">
-            <img src="${p.image}" alt="${p.name}" class="product-img">
+            <img src="${p.image}" alt="${p.name}" class="product-img" loading="lazy">
           </a>
           ${p.badge ? `<span class="product-card-badge ${p.badgeType}">${p.badge}</span>` : ''}
           <div class="product-card-actions">

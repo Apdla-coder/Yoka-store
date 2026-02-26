@@ -18,7 +18,8 @@ async function loadCategoryProducts() {
   const countEl = document.getElementById('categoryProductCount');
   if (!main || !grid) return;
 
-  await loadCategoryHeroBgImageFromSettings();
+  // Start loading hero background and category metadata in parallel
+  const heroPromise = loadCategoryHeroBgImageFromSettings();
 
   const slug = main.dataset.category;
   const config = CATEGORY_CONFIG[slug] || { name: slug, slug };
@@ -49,7 +50,8 @@ async function loadCategoryProducts() {
           `)
           .eq('is_active', true)
           .eq('category_id', catData.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(24); // Limit for faster initial load
 
         if (!error && data) {
           products = data.map(p => ({
@@ -79,6 +81,9 @@ async function loadCategoryProducts() {
     const allProducts = window.PRODUCTS || [];
     products = allProducts.filter(p => p.category === slug);
   }
+
+  // Ensure hero promise is resolved
+  await heroPromise;
 
   window.PRODUCTS = products;
 

@@ -7,13 +7,13 @@
     <title>إتمام الطلب | Yoka Store</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
     <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
+    <script src="site-settings.js"></script>
+    <script src="cloudinary-upload.js"></script>
     <style>
         .checkout-page {
             padding: 10rem 0 5rem;
@@ -335,23 +335,60 @@
 
                     <div class="payment-options">
                         <label class="form-label">طريقة الدفع</label>
-
-                        <div class="payment-option active" onclick="selectPayment(this, 'card')">
-                            <div class="payment-circle"></div>
-                            <span>بطاقة ائتمان / بطاقة مدى</span>
-                            <span style="margin-right:auto;font-size:1.5rem">💳</span>
+                        <div id="paymentOptionsContainer">
+                            <div class="payment-option" data-method="card" onclick="selectPayment(this, 'card')">
+                                <div class="payment-circle"></div>
+                                <span>بطاقة ائتمان / بطاقة مدى</span>
+                                <span style="margin-right:auto;font-size:1.5rem">💳</span>
+                            </div>
+                            <div class="payment-option" data-method="apple" onclick="selectPayment(this, 'apple')">
+                                <div class="payment-circle"></div>
+                                <span>Apple Pay</span>
+                                <span style="margin-right:auto;font-size:1.5rem">🍎</span>
+                            </div>
+                            <div class="payment-option" data-method="cod" onclick="selectPayment(this, 'cod')">
+                                <div class="payment-circle"></div>
+                                <span>الدفع عند الاستلام</span>
+                                <span style="margin-right:auto;font-size:1.5rem">💵</span>
+                            </div>
+                            <div class="payment-option" data-method="instapay"
+                                onclick="selectPayment(this, 'instapay')">
+                                <div class="payment-circle"></div>
+                                <span>انستا باي (InstaPay)</span>
+                                <span style="margin-right:auto;font-size:1.5rem">📱</span>
+                            </div>
+                            <div class="payment-option" data-method="ewallet" onclick="selectPayment(this, 'ewallet')">
+                                <div class="payment-circle"></div>
+                                <span>محفظة إلكترونية</span>
+                                <span style="margin-right:auto;font-size:1.5rem">👛</span>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="payment-option" onclick="selectPayment(this, 'apple')">
-                            <div class="payment-circle"></div>
-                            <span>Apple Pay</span>
-                            <span style="margin-right:auto;font-size:1.5rem">🍎</span>
+                    <!-- InstaPay / E-wallet: رابط أو رقم + رفع إيصال -->
+                    <div id="receiptSection"
+                        style="display:none;margin-top:1.5rem;padding:1.25rem;background:rgba(212,165,165,.08);border-radius:var(--radius-sm);border:1px solid var(--rose-light)">
+                        <div id="instapayBlock" style="display:none;margin-bottom:1rem">
+                            <label class="form-label">الانتقال لبوابة الدفع</label>
+                            <a id="instapayLinkBtn" href="#" target="_blank" rel="noopener" class="place-order-btn"
+                                style="display:inline-flex;padding:.75rem 1.5rem;margin-bottom:1rem;text-decoration:none">📱
+                                الدفع عبر انستا باي</a>
                         </div>
-
-                        <div class="payment-option" onclick="selectPayment(this, 'cod')">
-                            <div class="payment-circle"></div>
-                            <span>الدفع عند الاستلام</span>
-                            <span style="margin-right:auto;font-size:1.5rem">💵</span>
+                        <div id="ewalletBlock" style="display:none;margin-bottom:1rem">
+                            <label class="form-label">رقم المحفظة للتحويل</label>
+                            <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+                                <span id="ewalletNumberDisplay"
+                                    style="font-size:1.2rem;font-weight:700;color:var(--rose-dark);letter-spacing:.05em">—</span>
+                                <button type="button"
+                                    onclick="navigator.clipboard.writeText(document.getElementById('ewalletNumberDisplay').textContent); (typeof showToast==='function'?showToast:alert)('تم النسخ')"
+                                    style="padding:.35rem .75rem;font-size:.8rem;border:1px solid var(--rose-light);border-radius:var(--radius-sm);background:transparent;cursor:pointer">نسخ</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:1rem">
+                            <label class="form-label">رفع صورة الإيصال *</label>
+                            <input type="file" id="receiptFile" accept="image/*"
+                                style="display:block;width:100%;padding:.5rem;border:1px dashed var(--rose-light);border-radius:var(--radius-sm);background:var(--cream)" />
+                            <p id="receiptFileName" style="font-size:.8rem;color:var(--text3);margin-top:.35rem"></p>
                         </div>
                     </div>
                 </main>
@@ -368,9 +405,13 @@
                         <span>المجموع</span>
                         <span id="sumSubtotal">٠ ج.م</span>
                     </div>
+                    <div class="sum-row" id="sumDiscountRow" style="display:none">
+                        <span>خصم الكود</span>
+                        <span id="sumDiscount" style="color:var(--rose)">—</span>
+                    </div>
                     <div class="sum-row">
                         <span>رسوم الشحن</span>
-                        <span id="sumShipping">مجاني</span>
+                        <span id="sumShipping">—</span>
                     </div>
                     <div class="sum-row total">
                         <span>الإجمالي</span>
@@ -402,11 +443,92 @@
     <script src="script.js"></script>
     <script src="cart-manager.js"></script>
     <script>
+        let selectedPaymentMethod = 'card';
+
         document.addEventListener('DOMContentLoaded', async () => {
-            // Wait for cart manager
             await new Promise(resolve => setTimeout(resolve, 500));
+            if (typeof loadSiteSettings === 'function') await loadSiteSettings();
+            renderPaymentOptions();
             renderSummary();
+            document.getElementById('receiptFile')?.addEventListener('change', function () {
+                const name = this.files?.[0]?.name;
+                document.getElementById('receiptFileName').textContent = name ? '✓ ' + name : '';
+            });
         });
+
+        function renderPaymentOptions() {
+            const s = window.SITE_SETTINGS || {};
+            const opts = document.querySelectorAll('#paymentOptionsContainer .payment-option');
+            const map = { card: s.payment_visa, apple: s.payment_apple, cod: s.payment_cod, instapay: s.payment_instapay, ewallet: s.payment_ewallet };
+            let firstVisible = null;
+            opts.forEach(opt => {
+                const method = opt.dataset.method;
+                const enabled = map[method] !== false;
+                opt.style.display = enabled ? '' : 'none';
+                if (enabled && !firstVisible) firstVisible = opt;
+            });
+            if (firstVisible) {
+                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+                firstVisible.classList.add('active');
+                selectedPaymentMethod = firstVisible.dataset.method;
+                updateReceiptSection(selectedPaymentMethod);
+            }
+        }
+
+        function updateReceiptSection(method) {
+            const receiptSection = document.getElementById('receiptSection');
+            const instapayBlock = document.getElementById('instapayBlock');
+            const ewalletBlock = document.getElementById('ewalletBlock');
+            if (!receiptSection) return;
+            if (method === 'instapay' || method === 'ewallet') {
+                receiptSection.style.display = '';
+                if (method === 'instapay') {
+                    instapayBlock.style.display = '';
+                    ewalletBlock.style.display = 'none';
+                    const link = document.getElementById('instapayLinkBtn');
+                    const instapayUrl = window.SITE_SETTINGS?.instapay_link || '';
+                    if (link) {
+                        if (instapayUrl) {
+                            link.href = instapayUrl;
+                            link.style.opacity = '1';
+                            link.style.pointerEvents = '';
+                            link.title = '';
+                        } else {
+                            link.href = '#';
+                            link.style.opacity = '0.5';
+                            link.style.pointerEvents = 'none';
+                            link.title = 'رابط الدفع غير محدد بعد';
+                            // رسالة تنبيه إذا كان الرابط فارغاً
+                            let warn = document.getElementById('instapayWarn');
+                            if (!warn) {
+                                warn = document.createElement('p');
+                                warn.id = 'instapayWarn';
+                                warn.style.cssText = 'font-size:.82rem;color:#c0392b;margin-top:.4rem;';
+                                link.parentNode.insertBefore(warn, link.nextSibling);
+                            }
+                            warn.textContent = '⚠️ لم يُحدَّد رابط انستا باي بعد — يرجى التواصل معنا.';
+                        }
+                    }
+                } else {
+                    instapayBlock.style.display = 'none';
+                    ewalletBlock.style.display = '';
+                    const el = document.getElementById('ewalletNumberDisplay');
+                    const walletNum = window.SITE_SETTINGS?.ewallet_number || '';
+                    if (el) {
+                        if (walletNum) {
+                            el.textContent = walletNum;
+                            el.style.color = 'var(--rose-dark)';
+                        } else {
+                            el.textContent = 'لم يُحدَّد رقم المحفظة بعد';
+                            el.style.color = '#c0392b';
+                            el.style.fontSize = '.85rem';
+                        }
+                    }
+                }
+            } else {
+                receiptSection.style.display = 'none';
+            }
+        }
 
         function renderSummary() {
             if (!window.cartManager) return;
@@ -428,14 +550,50 @@
         </div>
       `).join('');
 
+            const s = window.SITE_SETTINGS || {};
+            const shippingFee = s.shipping_fee || 25;
+            const freeMin = s.free_shipping_min || 200;
+
             const subtotal = window.cartManager.getCartTotal();
+            const appliedCoupon = JSON.parse(localStorage.getItem('yoka_applied_coupon') || 'null');
+
+            let discount = 0;
+            if (appliedCoupon) {
+                if (appliedCoupon.type === 'percentage') discount = subtotal * (appliedCoupon.value / 100);
+                else if (appliedCoupon.type === 'fixed') discount = appliedCoupon.value;
+            }
+            const afterDiscount = Math.max(0, subtotal - discount);
+            const shipping = appliedCoupon?.type === 'free_shipping' ? 0 : (afterDiscount >= freeMin ? 0 : shippingFee);
+            const total = afterDiscount + shipping;
+
             document.getElementById('sumSubtotal').textContent = `${subtotal} ج.م`;
-            document.getElementById('sumTotal').textContent = `${subtotal} ج.م`;
+            const discountRow = document.getElementById('sumDiscountRow');
+            const discountEl = document.getElementById('sumDiscount');
+            if (discount > 0) {
+                discountRow.style.display = '';
+                discountEl.textContent = `−${discount.toFixed(0)} ج.م`;
+            } else if (appliedCoupon?.type === 'free_shipping') {
+                discountRow.style.display = '';
+                discountEl.textContent = 'شحن مجاني';
+            } else {
+                discountRow.style.display = 'none';
+            }
+            document.getElementById('sumShipping').textContent = shipping === 0 ? 'مجاني' : `${shipping} ج.م`;
+            document.getElementById('sumTotal').textContent = `${total.toFixed(0)} ج.م`;
+
+            window._checkoutTotal = total;
+            window._checkoutSubtotal = subtotal;
+            window._checkoutDiscount = discount;
+            window._checkoutShipping = shipping;
         }
 
         function selectPayment(el, method) {
             document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
             el.classList.add('active');
+            selectedPaymentMethod = method;
+            document.getElementById('receiptFile').value = '';
+            document.getElementById('receiptFileName').textContent = '';
+            updateReceiptSection(method);
         }
 
         async function completeOrder() {
@@ -455,11 +613,15 @@
                 return;
             }
 
-            // Get Payment Method
-            const activePayment = document.querySelector('.payment-option.active span').textContent;
-            let paymentMethod = 'card';
-            if (activePayment.includes('Apple')) paymentMethod = 'apple';
-            if (activePayment.includes('الاستلام')) paymentMethod = 'cod';
+            const paymentMap = { card: 'card', apple: 'apple', cod: 'cod', instapay: 'instapay', ewallet: 'ewallet' };
+            const paymentMethod = paymentMap[selectedPaymentMethod] || 'card';
+
+            const needsReceipt = paymentMethod === 'instapay' || paymentMethod === 'ewallet';
+            const receiptFile = document.getElementById('receiptFile')?.files?.[0];
+            if (needsReceipt && !receiptFile) {
+                showToast('يرجى رفع صورة إيصال الدفع');
+                return;
+            }
 
             btn.disabled = true;
             btn.innerHTML = '<span class="loader-inline"></span> جاري معالجة الطلب...';
@@ -468,7 +630,7 @@
                 if (!window.cartManager) throw new Error('Cart manager not initialized');
 
                 const items = window.cartManager.getCartItems();
-                const total = window.cartManager.getCartTotal();
+                const total = window._checkoutTotal ?? window.cartManager.getCartTotal();
 
                 if (items.length === 0) {
                     showToast('السلة فارغة!');
@@ -478,22 +640,36 @@
 
                 if (!window.supabaseClient) throw new Error('Database connection missing');
 
+                const discountAmount = window._checkoutDiscount || 0;
+                const shippingCost = window._checkoutShipping || 0;
+                const subtotalOrder = window._checkoutSubtotal ?? total;
+
+                let receiptUrl = null;
+                if (needsReceipt && receiptFile && typeof uploadToCloudinary === 'function') {
+                    receiptUrl = await uploadToCloudinary(receiptFile);
+                }
+
+                const orderPayload = {
+                    customer_name: name,
+                    customer_phone: phone,
+                    customer_email: email,
+                    city: city,
+                    area: area,
+                    address: address,
+                    subtotal: subtotalOrder,
+                    total_amount: total,
+                    total: total,
+                    discount_amount: discountAmount,
+                    shipping_cost: shippingCost,
+                    payment_method: paymentMethod,
+                    status: 'pending'
+                };
+                if (receiptUrl) orderPayload.receipt_url = receiptUrl;
+
                 // 1. Create Order
                 const { data: order, error: orderError } = await window.supabaseClient
                     .from('orders')
-                    .insert({
-                        customer_name: name,
-                        customer_phone: phone,
-                        customer_email: email,
-                        city: city,
-                        area: area,
-                        address: address,
-                        subtotal: total,
-                        total_amount: total,
-                        total: total,
-                        payment_method: paymentMethod,
-                        status: 'pending'
-                    })
+                    .insert(orderPayload)
                     .select()
                     .single();
 
@@ -503,8 +679,8 @@
                 const orderItems = items.map(item => ({
                     order_id: order.id,
                     product_id: item.productId,
-                    product_name: item.name,
-                    product_image: item.image,
+                    product_name: item.name || 'منتج',
+                    product_image: item.image || item.image_url || '',
                     quantity: item.quantity,
                     price_at_time: item.price
                 }));
@@ -517,6 +693,7 @@
 
                 // 3. Success
                 await window.cartManager.clearCart();
+                localStorage.removeItem('yoka_applied_coupon');
 
                 document.getElementById('orderNumber').textContent = '#' + (order.order_number || order.id.slice(0, 8));
 

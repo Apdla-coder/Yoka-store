@@ -5,9 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Yoka Admin — لوحة التحكم</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Alexandria:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <style>
@@ -43,8 +43,8 @@
       --text2: #b8a8a4;
       --text3: #7a6860;
 
-      --font-d: 'Cormorant Garamond', Georgia, serif;
-      --font-b: 'Alexandria', sans-serif;
+      --font-d: 'Lemonada', cursive;
+      --font-b: 'Lemonada', cursive;
 
       --r-sm: 8px;
       --r-md: 14px;
@@ -1966,6 +1966,19 @@
   </div>
 
   <!-- ══════════════════════════════════════
+     ORDER DETAILS MODAL
+══════════════════════════════════════ -->
+  <div class="modal-bg" id="orderDetailsModal" onclick="if(event.target===this)closeOrderDetailsModal()">
+    <div class="modal-box" style="max-width:520px;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <button class="modal-close-x" onclick="closeOrderDetailsModal()">✕</button>
+      <div class="modal-title">تفاصيل <em>الطلب</em></div>
+      <div id="orderDetailsContent" style="line-height:1.8;color:var(--text2)">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
      DELETE MODAL
 ══════════════════════════════════════ -->
   <div class="modal-bg" id="deleteModal">
@@ -2707,6 +2720,9 @@
               value="0" min="0" /></div>
           <div class="form-group"><label class="form-label">رابط الصورة (Image URL)</label><input type="text"
               id="adminCategoryImage" placeholder="https://images.unsplash.com/..." /></div>
+          <div class="form-group"><label class="form-label">الوصف (Description)</label>
+            <textarea id="adminCategoryDesc" placeholder="وصف موجز للفئة..." rows="2"></textarea>
+          </div>
           <button class="btn btn-rose" style="width:100%;justify-content:center;margin-top:.5rem"
             onclick="saveCategory()">حفظ الفئة</button>
         </div>
@@ -3002,27 +3018,52 @@
       <div id="st-appearance" style="display:none">
         <div class="grid-2">
           <div class="card">
-            <div class="card-title">تخصيص الهيرو (Hero Section)</div>
+            <div class="card-title">تخصيص سلايدر الهيرو (Hero Slider)</div>
             <div class="form-group">
-              <label class="form-label">خلفية الهيرو - الرئيسية (صورة)</label>
-              <input type="text" id="set_hero_home_bg" placeholder="URL للصورة"
-                oninput="document.getElementById('prev_home').style.backgroundImage = 'url('+this.value+')'" />
-              <div id="prev_home"
+              <label class="form-label">خلفية الهيرو الرئيسية (صورة - URL)</label>
+              <input type="text" id="set_hero_bg_image" placeholder="URL للصورة"
+                oninput="document.getElementById('prev_hero_bg').style.backgroundImage = 'url('+this.value+')'" />
+              <div id="prev_hero_bg"
                 style="height:100px; background-size:cover; background-position:center; margin-top:0.5rem; border-radius:4px; border:1px solid #eee;">
               </div>
+              <p style="font-size:0.75rem; color:var(--text3); margin-top:0.3rem;">* الصورة ستُطبَّق على خلفية قسم
+                الهيرو بالكامل في الصفحة الرئيسية.</p>
             </div>
             <div class="form-group">
-              <label class="form-label">خلفية الهيرو - الرئيسية (لون)</label>
-              <input type="color" id="set_hero_home_color" style="width:100%; height:40px; padding:2px;" />
+              <label class="form-label">السلايد الأول (صورة)</label>
+              <input type="text" id="set_hero_slide_1" placeholder="URL للصورة"
+                oninput="document.getElementById('prev_slide_1').style.backgroundImage = 'url('+this.value+')'" />
+              <div id="prev_slide_1" class="admin-slide-preview"></div>
             </div>
             <div class="form-group">
-              <label class="form-label">صورة الشكل الدائري (Blob Shape - يمين الهيرو)</label>
-              <input type="text" id="set_hero_blob_image" placeholder="URL للصورة"
-                oninput="document.getElementById('prev_blob').style.backgroundImage = 'url('+this.value+')'" />
-              <div id="prev_blob"
-                style="height:100px; background-size:cover; background-position:center; margin-top:0.5rem; border-radius:50% 50% 48% 52% / 55% 55% 45% 45%; border:1px solid rgba(212,165,165,.3);">
-              </div>
+              <label class="form-label">السلايد الثاني (صورة)</label>
+              <input type="text" id="set_hero_slide_2" placeholder="URL للصورة"
+                oninput="document.getElementById('prev_slide_2').style.backgroundImage = 'url('+this.value+')'" />
+              <div id="prev_slide_2" class="admin-slide-preview"></div>
             </div>
+            <div class="form-group">
+              <label class="form-label">السلايد الثالث (صورة)</label>
+              <input type="text" id="set_hero_slide_3" placeholder="URL للصورة"
+                oninput="document.getElementById('prev_slide_3').style.backgroundImage = 'url('+this.value+')'" />
+              <div id="prev_slide_3" class="admin-slide-preview"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">السلايد الرابع (صورة)</label>
+              <input type="text" id="set_hero_slide_4" placeholder="URL للصورة"
+                oninput="document.getElementById('prev_slide_4').style.backgroundImage = 'url('+this.value+')'" />
+              <div id="prev_slide_4" class="admin-slide-preview"></div>
+            </div>
+            <style>
+              .admin-slide-preview {
+                height: 80px;
+                background-size: cover;
+                background-position: center;
+                margin-top: 0.5rem;
+                border-radius: 4px;
+                border: 1px solid #eee;
+                background-color: #f9f9f9;
+              }
+            </style>
             <div class="form-group">
               <label class="form-label">خلفية الهيرو - المتجر (صورة)</label>
               <input type="text" id="set_hero_shop_bg" placeholder="URL للصورة"
@@ -3099,6 +3140,25 @@
                 الحملة بالكامل (تحكم في opacity من الـ CSS)</p>
             </div>
           </div>
+          <div class="card">
+            <div class="card-title">صور قسم انستقرام (Social Grid)</div>
+            <p style="font-size:0.75rem; color:var(--text3); margin-bottom:1rem;">أضيفي روابط الصور الـ 6 التي تظهر في
+              قسم "تابعونا على انستقرام".</p>
+            <div class="grid-2">
+              <div class="form-group"><label class="form-label">الصورة ١</label><input type="text" id="set_social_img_1"
+                  placeholder="URL للصورة" /></div>
+              <div class="form-group"><label class="form-label">الصورة ٢</label><input type="text" id="set_social_img_2"
+                  placeholder="URL للصورة" /></div>
+              <div class="form-group"><label class="form-label">الصورة ٣</label><input type="text" id="set_social_img_3"
+                  placeholder="URL للصورة" /></div>
+              <div class="form-group"><label class="form-label">الصورة ٤</label><input type="text" id="set_social_img_4"
+                  placeholder="URL للصورة" /></div>
+              <div class="form-group"><label class="form-label">الصورة ٥</label><input type="text" id="set_social_img_5"
+                  placeholder="URL للصورة" /></div>
+              <div class="form-group"><label class="form-label">الصورة ٦</label><input type="text" id="set_social_img_6"
+                  placeholder="URL للصورة" /></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3106,19 +3166,56 @@
       <div id="st-payment" style="display:none">
         <div class="card">
           <div class="card-title">طرق الدفع المفعلة</div>
-          <p style="color:var(--text3); font-size:0.9rem; margin-bottom:1rem;">(تحت التطوير - الإعدادات حالياً للعرض
-            فقط)</p>
+          <p style="color:var(--text3); font-size:0.9rem; margin-bottom:1rem;">فعّلي أو عطّلي طرق الدفع التي تظهر للعميل
+            في صفحة إتمام الطلب.</p>
           <div class="toggle-row">
-            <div class="toggle-row-info"><strong>بطاقة Visa / Mastercard</strong></div>
-            <label class="toggle"><input type="checkbox" checked disabled /><span class="toggle-slider"></span></label>
+            <div class="toggle-row-info"><strong>بطاقة Visa / Mastercard / مدى</strong></div>
+            <label class="toggle"><input type="checkbox" id="set_payment_visa" checked /><span
+                class="toggle-slider"></span></label>
           </div>
           <div class="toggle-row">
             <div class="toggle-row-info"><strong>Apple Pay</strong></div>
-            <label class="toggle"><input type="checkbox" checked disabled /><span class="toggle-slider"></span></label>
+            <label class="toggle"><input type="checkbox" id="set_payment_apple" checked /><span
+                class="toggle-slider"></span></label>
           </div>
           <div class="toggle-row">
             <div class="toggle-row-info"><strong>الدفع عند الاستلام (COD)</strong></div>
-            <label class="toggle"><input type="checkbox" checked disabled /><span class="toggle-slider"></span></label>
+            <label class="toggle"><input type="checkbox" id="set_payment_cod" checked /><span
+                class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-info"><strong>انستا باي (InstaPay)</strong></div>
+            <label class="toggle"><input type="checkbox" id="set_payment_instapay" checked /><span
+                class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-info"><strong>محفظة إلكترونية</strong></div>
+            <label class="toggle"><input type="checkbox" id="set_payment_ewallet" checked /><span
+                class="toggle-slider"></span></label>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.5rem">
+          <div class="card-title">إعدادات انستا باي ومحفظة إلكترونية</div>
+          <div class="form-group">
+            <label class="form-label">رابط بوابة انستا باي (InstaPay)</label>
+            <input type="url" id="set_instapay_link" placeholder="https://pay.instapay.com/..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم المحفظة الإلكترونية (للتحويل)</label>
+            <input type="text" id="set_ewallet_number" placeholder="01XXXXXXXXX" />
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.5rem">
+          <div class="card-title">Cloudinary (رفع الصور)</div>
+          <p style="color:var(--text3);font-size:.85rem;margin-bottom:.75rem">لرفع إيصالات الدفع والصور. أنشئ حساباً
+            مجانياً على <a href="https://cloudinary.com" target="_blank" rel="noopener">cloudinary.com</a></p>
+          <div class="form-group">
+            <label class="form-label">Cloud Name</label>
+            <input type="text" id="set_cloudinary_cloud_name" placeholder="your-cloud-name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Upload Preset (unsigned)</label>
+            <input type="text" id="set_cloudinary_upload_preset" placeholder="preset_name" />
           </div>
         </div>
       </div>
@@ -3128,12 +3225,12 @@
         <div class="card">
           <div class="card-title">إعدادات الشحن والتوصيل</div>
           <div class="form-group">
-            <label class="form-label">رسوم الشحن الافتراضية</label>
-            <input type="number" id="set_shipping_fee" value="25" />
+            <label class="form-label">رسوم الشحن الافتراضية (ج.م)</label>
+            <input type="number" id="set_shipping_fee" value="25" min="0" step="1" />
           </div>
           <div class="form-group">
-            <label class="form-label">الحد الأدنى للشحن المجاني</label>
-            <input type="number" id="set_free_shipping_min" value="200" />
+            <label class="form-label">الحد الأدنى للشحن المجاني (ج.م)</label>
+            <input type="number" id="set_free_shipping_min" value="200" min="0" step="1" />
           </div>
         </div>
       </div>
@@ -3321,16 +3418,19 @@
           real_id: o.id,
           name: o.customer_name,
           phone: o.customer_phone,
+          email: o.customer_email,
           city: o.city,
           area: o.area,
           address: o.address,
           count: (o.order_items || []).length,
           subtotal: parseFloat(o.subtotal || o.total || o.total_amount).toLocaleString('ar'),
           amount: parseFloat(o.total || o.total_amount).toLocaleString('ar'),
-          pay: o.payment_method === 'card' ? 'بطاقة' : o.payment_method === 'apple' ? 'Apple Pay' : 'نقدي',
+          pay: o.payment_method === 'card' ? 'بطاقة' : o.payment_method === 'apple' ? 'Apple Pay' : o.payment_method === 'instapay' ? 'انستا باي' : o.payment_method === 'ewallet' ? 'محفظة' : o.payment_method === 'cod' ? 'نقدي' : o.payment_method || '—',
           status: o.status,
           date: new Date(o.created_at).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' }),
-          items: o.order_items || []
+          items: o.order_items || [],
+          receipt_url: o.receipt_url,
+          raw: o
         }));
 
         renderOrdersTable();
@@ -3418,16 +3518,31 @@
       const order = ADMIN_ORDERS.find(o => o.real_id === id);
       if (!order) return;
 
-      const details = `طلب ${order.id}:
-👤 ${order.name} (${order.phone || '—'})
-📍 ${order.city} - ${order.area || '—'}
-🏠 ${order.address || '—'}
-💵 المجموع الفرعي: ${order.subtotal} ج.م
-💰 الإجمالي: ${order.amount} ج.م
-📅 التاريخ: ${order.date}`;
+      const itemsHtml = (order.items || []).map(i => `
+        <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+          <span>${i.product_name || 'منتج'} × ${i.quantity}</span>
+          <span>${parseFloat(i.price_at_time || 0).toLocaleString('ar')} ج.م</span>
+        </div>
+      `).join('');
 
-      toast(details, 'success');
-      console.log('Order Items:', order.items);
+      const content = document.getElementById('orderDetailsContent');
+      content.innerHTML = `
+        <div style="margin-bottom:1rem"><strong style="color:var(--rose2)">#${order.id}</strong> · ${order.date}</div>
+        <div style="margin-bottom:1rem"><strong>👤 العميل:</strong> ${order.name}</div>
+        <div style="margin-bottom:1rem"><strong>📞 الجوال:</strong> ${order.phone || '—'}</div>
+        <div style="margin-bottom:1rem"><strong>✉️ البريد:</strong> ${order.email || '—'}</div>
+        <div style="margin-bottom:1rem"><strong>📍 العنوان:</strong> ${order.city || ''} ${order.area ? '– ' + order.area : ''}<br><span style="font-size:.9rem">${order.address || '—'}</span></div>
+        <div style="margin-bottom:1rem"><strong>💳 الدفع:</strong> ${order.pay}</div>
+        <div style="margin-bottom:1rem"><strong>📦 المنتجات:</strong><div style="margin-top:.5rem">${itemsHtml || '—'}</div></div>
+        <div style="margin-bottom:1rem"><strong>💵 المجموع:</strong> ${order.subtotal} ج.م · <strong>الإجمالي:</strong> ${order.amount} ج.م</div>
+        ${order.receipt_url ? `<div style="margin-top:1rem"><strong>🧾 إيصال الدفع:</strong><br><a href="${order.receipt_url}" target="_blank" rel="noopener" style="color:var(--rose);text-decoration:underline">عرض الصورة</a></div>` : ''}
+      `;
+
+      document.getElementById('orderDetailsModal').classList.add('open');
+    }
+
+    function closeOrderDetailsModal() {
+      document.getElementById('orderDetailsModal').classList.remove('open');
     }
 
     // ── Products Table (Supabase) ───────────────────────
@@ -3475,7 +3590,7 @@
     async function loadAdminCategories() {
       if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') return;
       try {
-        const { data, error } = await window.supabaseClient.from('categories').select('id, name, slug').eq('is_active', true).order('order');
+        const { data, error } = await window.supabaseClient.from('categories').select('id, name, slug, description, image_url').eq('is_active', true).order('order');
         if (!error) ADMIN_CATEGORIES = data || [];
         const sel = document.getElementById('adminCategory');
         if (sel && ADMIN_CATEGORIES.length) {
@@ -3512,6 +3627,7 @@
       document.getElementById('adminCategorySlug').value = '';
       document.getElementById('adminCategoryOrder').value = '0';
       document.getElementById('adminCategoryImage').value = '';
+      document.getElementById('adminCategoryDesc').value = '';
       toast('أدخلي بيانات الفئة الجديدة', '');
     }
     async function editCategory(id) {
@@ -3524,6 +3640,7 @@
         document.getElementById('adminCategorySlug').value = c.slug || '';
         document.getElementById('adminCategoryOrder').value = c.order ?? 0;
         document.getElementById('adminCategoryImage').value = c.image_url || '';
+        document.getElementById('adminCategoryDesc').value = c.description || '';
         toast('تم تحميل الفئة للتعديل', 'success');
       } catch (e) {
         toast('فشل تحميل الفئة', 'error');
@@ -3537,7 +3654,13 @@
       if (!slug) { toast('أدخلي الرابط (slug)', 'warning'); return; }
       if (!window.supabaseClient) { toast('الاتصال غير متاح', 'error'); return; }
       try {
-        const payload = { name, slug, "order": order, image_url: document.getElementById('adminCategoryImage')?.value?.trim() || '' };
+        const payload = {
+          name,
+          slug,
+          "order": order,
+          image_url: document.getElementById('adminCategoryImage')?.value?.trim() || '',
+          description: document.getElementById('adminCategoryDesc')?.value?.trim() || ''
+        };
         if (window.editCategoryId) {
           const { error } = await window.supabaseClient.from('categories').update(payload).eq('id', window.editCategoryId);
           if (error) throw error;
@@ -3552,6 +3675,7 @@
         document.getElementById('adminCategorySlug').value = '';
         document.getElementById('adminCategoryOrder').value = '0';
         document.getElementById('adminCategoryImage').value = '';
+        document.getElementById('adminCategoryDesc').value = '';
         await loadAdminCategories();
         renderCategoriesList();
       } catch (e) {
@@ -3958,6 +4082,39 @@
           console.error(e);
           toast('فشل حذف الطلب', 'error');
         }
+      } else if (deleteTargetType === 'الكوبون' && deleteId && window.supabaseClient) {
+        try {
+          const { error } = await window.supabaseClient.from('coupons').delete().eq('id', deleteId);
+          if (error) throw error;
+          toast('تم حذف الكوبون بنجاح', 'success');
+          await loadAdminCoupons();
+          renderCouponsList();
+        } catch (e) {
+          console.error(e);
+          toast('فشل حذف الكوبون', 'error');
+        }
+      } else if (deleteTargetType === 'البانر' && deleteId && window.supabaseClient) {
+        try {
+          const { error } = await window.supabaseClient.from('banners').delete().eq('id', deleteId);
+          if (error) throw error;
+          toast('تم حذف البانر بنجاح', 'success');
+          await loadAdminBanners();
+          renderBannersList();
+        } catch (e) {
+          console.error(e);
+          toast('فشل حذف البانر', 'error');
+        }
+      } else if (deleteTargetType === 'التقييم' && deleteId && window.supabaseClient) {
+        try {
+          const { error } = await window.supabaseClient.from('reviews').delete().eq('id', deleteId);
+          if (error) throw error;
+          toast('تم حذف التقييم بنجاح', 'success');
+          await loadAdminReviews();
+          renderReviewsList();
+        } catch (e) {
+          console.error(e);
+          toast('فشل حذف التقييم', 'error');
+        }
       } else {
         toast('تم الحذف بنجاح', 'success');
       }
@@ -4099,8 +4256,14 @@
         (data || []).forEach(item => {
           const el = document.getElementById('set_' + item.key);
           if (el) {
-            if (el.tagName === 'SELECT' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-              el.value = item.value;
+            if (el.type === 'checkbox') {
+              el.checked = item.value === '1' || item.value === 'true';
+            } else if (el.tagName === 'SELECT' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+              el.value = item.value || '';
+              // Trigger preview update if exists
+              const prevId = 'prev_' + item.key.replace('hero_', '');
+              const prevEl = document.getElementById(prevId);
+              if (prevEl) prevEl.style.backgroundImage = `url(${item.value})`;
             }
           }
         });
@@ -4113,17 +4276,22 @@
       const settings = [
         'store_name', 'store_logo', 'store_desc', 'store_currency',
         'social_ig', 'social_tt', 'social_sc',
-        'hero_home_bg', 'hero_home_color', 'hero_blob_image', 'hero_shop_bg',
+        'social_img_1', 'social_img_2', 'social_img_3', 'social_img_4', 'social_img_5', 'social_img_6',
+        'hero_slide_1', 'hero_slide_2', 'hero_slide_3', 'hero_slide_4', 'hero_shop_bg', 'hero_bg_image',
         'hero_cat_makeup', 'hero_cat_fashion', 'hero_cat_skincare', 'hero_cat_accessories',
         'color_rose', 'color_gold', 'color_text', 'color_bg',
-        'camp_tag', 'camp_title', 'camp_desc', 'camp_bg', 'camp_bg_image'
+        'camp_tag', 'camp_title', 'camp_desc', 'camp_bg', 'camp_bg_image',
+        'shipping_fee', 'free_shipping_min',
+        'payment_visa', 'payment_apple', 'payment_cod', 'payment_instapay', 'payment_ewallet',
+        'instapay_link', 'ewallet_number', 'cloudinary_cloud_name', 'cloudinary_upload_preset'
       ];
 
-      const rows = settings.map(key => ({
-        key: key,
-        value: document.getElementById('set_' + key)?.value || '',
-        updated_at: new Date().toISOString()
-      }));
+      const rows = settings.map(key => {
+        const el = document.getElementById('set_' + key);
+        if (!el) return null;
+        const value = el.type === 'checkbox' ? (el.checked ? '1' : '0') : (el.value || '');
+        return { key: key, value: String(value), updated_at: new Date().toISOString() };
+      }).filter(Boolean);
 
       if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') {
         toast('تم الحفظ محلياً (لا توجد قاعدة بيانات)', 'warning');

@@ -7,9 +7,7 @@
   <title>Yoka Store | متجر يوكا</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Alexandria:wght@200;300;400;500;700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -127,76 +125,108 @@
       <!-- Stats row -->
       <div class="hero-stats" data-reveal>
         <div class="hero-stat">
-          <span class="hero-stat-num">+٥٠٠</span>
-          <span class="hero-stat-label">منتج فاخر</span>
+          <div class="hero-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+          </div>
+          <div class="hero-stat-info">
+            <span class="hero-stat-num">+٥٠٠</span>
+            <span class="hero-stat-label">منتج فاخر</span>
+          </div>
         </div>
         <div class="hero-stat-divider"></div>
         <div class="hero-stat">
-          <span class="hero-stat-num">٤.٩ ★</span>
-          <span class="hero-stat-label">تقييم العملاء</span>
+          <div class="hero-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+          <div class="hero-stat-info">
+            <span class="hero-stat-num">٤.٩ ★</span>
+            <span class="hero-stat-label">تقييم العملاء</span>
+          </div>
         </div>
         <div class="hero-stat-divider"></div>
         <div class="hero-stat">
-          <span class="hero-stat-num">٢٤ ساعة</span>
-          <span class="hero-stat-label">توصيل سريع</span>
+          <div class="hero-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="3" width="15" height="13" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+          </div>
+          <div class="hero-stat-info">
+            <span class="hero-stat-num">٢٤ ساعة</span>
+            <span class="hero-stat-label">توصيل سريع</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Right: Visual -->
     <div class="hero-visual">
-      <div class="hero-image-frame">
-        <div class="hero-image-bg"></div>
-
-        <!-- Featured product label -->
-        <div class="hero-featured-badge">
-          <span class="hero-featured-dot"></span>
-          Featured
+      <div class="hero-slider" id="heroSlider">
+        <!-- Slide 1: Beauty/Makeup -->
+        <div class="hero-slide active">
+          <img src="https://images.unsplash.com/photo-1596462502278-27bfdc4033c8?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Beauty" />
+        </div>
+        <!-- Slide 2: Fashion -->
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1539109132381-31a1ba974f82?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Fashion" />
+        </div>
+        <!-- Slide 3: Skincare -->
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Skin" />
+        </div>
+        <!-- Slide 4: Accessories -->
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Accessories" />
         </div>
 
-        <!-- Floating cards -->
-        <div class="hero-floating-card card-1">
-          <span class="card-icon-img">
-            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Star"
-              style="width:16px;height:16px;">
+        <div class="slider-dots" id="sliderDots">
+          <span class="dot active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
+          <span class="dot" data-index="3"></span>
+        </div>
+      </div>
+
+
+      <!-- Scroll hint -->
+      <div class="hero-scroll">
+        <span>مرري للأسفل</span>
+        <div class="scroll-line"></div>
+      </div>
+
+
+
+      <!-- Bottom Marquee -->
+      <div class="hero-marquee">
+        <div class="marquee-track">
+          <span>EXCLUSIVE COLLECTIONS · 2025 SUMMER ARRIVALS · LUXURY BEAUTY · PREMIUM FASHION · SKINCARE ESSENTIALS ·
           </span>
-          <span>Best Seller</span>
+          <span>EXCLUSIVE COLLECTIONS · 2025 SUMMER ARRIVALS · LUXURY BEAUTY · PREMIUM FASHION · SKINCARE ESSENTIALS ·
+          </span>
+          <span>EXCLUSIVE COLLECTIONS · 2025 SUMMER ARRIVALS · LUXURY BEAUTY · PREMIUM FASHION · SKINCARE ESSENTIALS ·
+          </span>
         </div>
-        <div class="hero-floating-card card-2">
-          <span>Lip Kit</span>
-          <span class="card-price">٢٩٠ ج.م</span>
-        </div>
-
-        <!-- Deco shapes -->
-        <div class="hero-shape s1"></div>
-        <div class="hero-shape s2"></div>
-        <div class="hero-shape s3"></div>
       </div>
-
-      <!-- Side trust strip -->
-      <div class="hero-trust">
-        <span>✦ جودة مضمونة</span>
-        <span>✦ شحن مجاني فوق ٥٠٠ ج.م</span>
-        <span>✦ إرجاع مجاني</span>
-      </div>
-    </div>
-
-    <!-- Scroll hint -->
-    <div class="hero-scroll">
-      <span>مرري للأسفل</span>
-      <div class="scroll-line"></div>
-    </div>
-
-    <!-- Bottom Marquee -->
-    <div class="hero-marquee">
-      <div class="marquee-track">
-        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · Skincare · Accessories · </span>
-        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · Skincare · Accessories · </span>
-        <span>Makeup · Fashion · Beauty · Yoka · Luxury · Style · Elegance · Skincare · Accessories · </span>
-      </div>
-    </div>
   </section>
 
+  <div class="hero-trust">
+    <span>✦ منتجات أصلية ١٠٠٪</span>
+    <span>✦ شحن سريع لكل المحافظات</span>
+    <span>✦ الدفع عند الاستلام</span>
+  </div>
+  </div>
 
   <!-- Categories Section -->
   <section class="categories section">
@@ -364,25 +394,27 @@
     <div class="container">
       <div class="section-header centered" data-reveal>
         <span class="section-tag">تابعينا</span>
-        <h2 class="section-title">@yokastore <em>على انستقرام</em></h2>
+        <h2 class="section-title"><a href="#" id="social-section-link" target="_blank"
+            style="color: inherit; text-decoration: none;"><span id="social-section-handle">@yokastore</span> <em>على
+              انستقرام</em></a></h2>
       </div>
       <div class="social-grid" data-reveal>
-        <div class="social-item si1">
+        <div class="social-item si1" id="social-item-1">
           <div class="si-overlay"><span>♡ 2.4k</span></div>
         </div>
-        <div class="social-item si2">
+        <div class="social-item si2" id="social-item-2">
           <div class="si-overlay"><span>♡ 1.8k</span></div>
         </div>
-        <div class="social-item si3">
+        <div class="social-item si3" id="social-item-3">
           <div class="si-overlay"><span>♡ 3.1k</span></div>
         </div>
-        <div class="social-item si4">
+        <div class="social-item si4" id="social-item-4">
           <div class="si-overlay"><span>♡ 980</span></div>
         </div>
-        <div class="social-item si5">
+        <div class="social-item si5" id="social-item-5">
           <div class="si-overlay"><span>♡ 2.2k</span></div>
         </div>
-        <div class="social-item si6">
+        <div class="social-item si6" id="social-item-6">
           <div class="si-overlay"><span>♡ 4.5k</span></div>
         </div>
       </div>
@@ -417,9 +449,9 @@
           </a>
           <p>متجرك المفضل للجمال والأزياء الراقية.<br />جودة لا تُقبل بأقل منها.</p>
           <div class="footer-socials">
-            <a href="#" class="social-link">Instagram</a>
-            <a href="#" class="social-link">TikTok</a>
-            <a href="#" class="social-link">Snapchat</a>
+            <a href="#" class="social-link" id="footer-social-ig" target="_blank">Instagram</a>
+            <a href="#" class="social-link" id="footer-social-tt" target="_blank">TikTok</a>
+            <a href="#" class="social-link" id="footer-social-sc" target="_blank">Snapchat</a>
           </div>
         </div>
 

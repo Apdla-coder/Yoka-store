@@ -107,6 +107,7 @@ CREATE TRIGGER set_order_number
 -- ─────────────────────────────────────────────────────────────────────────────
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_id TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS transaction_id TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS receipt_url TEXT;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 7. عمود stock_quantity في products (للمخزون)
@@ -179,6 +180,99 @@ ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO public.site_settings (key, value) VALUES ('hero_bg_accessories', '')
 ON CONFLICT (key) DO NOTHING;
+
+-- إعدادات الشحن والدفع
+INSERT INTO public.site_settings (key, value) VALUES ('shipping_fee', '25')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('free_shipping_min', '200')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('payment_visa', '1')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('payment_apple', '1')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('payment_cod', '1')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('payment_instapay', '1')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('payment_ewallet', '1')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('instapay_link', '')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('ewallet_number', '')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('cloudinary_cloud_name', '')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (key, value) VALUES ('cloudinary_upload_preset', '')
+ON CONFLICT (key) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 11. جدول الكوبونات (coupons)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.coupons (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  code        TEXT NOT NULL UNIQUE,
+  type        TEXT NOT NULL CHECK (type IN ('percentage', 'fixed', 'free_shipping')),
+  value       NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (value >= 0),
+  min_order   NUMERIC(12,2) DEFAULT 0 CHECK (min_order >= 0),
+  usage_limit INTEGER,
+  used_count  INTEGER NOT NULL DEFAULT 0,
+  expiry_date TIMESTAMPTZ,
+  status      TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'warning', 'expired')),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_coupons_code ON public.coupons(code);
+CREATE INDEX IF NOT EXISTS idx_coupons_status ON public.coupons(status);
+
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Coupons readable by everyone" ON public.coupons;
+CREATE POLICY "Coupons readable by everyone" ON public.coupons FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow anon to manage coupons" ON public.coupons;
+CREATE POLICY "Allow anon to manage coupons" ON public.coupons FOR ALL USING (true) WITH CHECK (true);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 12. جدول البانرات (banners)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.banners (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title      TEXT NOT NULL,
+  position   TEXT NOT NULL DEFAULT 'hero',
+  image_url  TEXT,
+  color_hex  TEXT DEFAULT '#cccccc',
+  status     TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'hidden')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_banners_status ON public.banners(status);
+
+ALTER TABLE public.banners ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Banners readable by everyone" ON public.banners;
+CREATE POLICY "Banners readable by everyone" ON public.banners FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow anon to manage banners" ON public.banners;
+CREATE POLICY "Allow anon to manage banners" ON public.banners FOR ALL USING (true) WITH CHECK (true);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 13. جدول التقييمات (reviews)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  product_id  UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  user_name   TEXT NOT NULL,
+  rating      SMALLINT NOT NULL DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
+  comment     TEXT,
+  status      TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'published', 'rejected')),
+  admin_reply TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON public.reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_status ON public.reviews(status);
+
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Reviews readable by everyone" ON public.reviews;
+CREATE POLICY "Reviews readable by everyone" ON public.reviews FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow anon to manage reviews" ON public.reviews;
+CREATE POLICY "Allow anon to manage reviews" ON public.reviews FOR ALL USING (true) WITH CHECK (true);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- تم. راجعي السياسات حسب احتياجك (مثلاً تقييد لوحة التحكم بـ auth فقط)
