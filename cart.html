@@ -64,6 +64,15 @@
       align-items: center;
       justify-content: center;
       font-size: 3rem;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .cart-item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-md);
     }
 
     .cart-item-brand {
@@ -279,21 +288,138 @@
       gap: .85rem;
     }
 
+    /* ── Responsive ── */
+
+    /* Tablet: stack layout */
     @media (max-width: 900px) {
       .cart-layout {
         grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .order-summary {
+        position: static;
+        top: auto;
       }
     }
 
-    @media (max-width: 600px) {
+    /* Mobile */
+    @media (max-width: 640px) {
+      .cart-page {
+        padding: 6.5rem 0 3rem;
+      }
+
+      /* Cart item: صورة + معلومات في صف واحد، السعر والكمية تحت */
       .cart-item {
+        display: grid;
         grid-template-columns: 80px 1fr;
+        grid-template-rows: auto auto;
+        gap: .75rem 1rem;
+        padding: 1.25rem 0;
+        align-items: start;
+      }
+
+      .cart-item-img {
+        width: 80px;
+        height: 96px;
+        border-radius: var(--radius-sm);
+        font-size: 2.2rem;
+        grid-row: 1 / 3;
+      }
+
+      .cart-item-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+      }
+
+      /* المعلومات (اسم، براند) في العمود الثاني */
+      .cart-item-info {
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      /* السعر والكمية تنزل تحت المعلومات */
+      .cart-item-right {
+        grid-column: 2;
+        grid-row: 2;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: .5rem;
+      }
+
+      .cart-item-name {
+        font-size: .95rem;
+      }
+
+      .cart-item-price {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--rose-dark);
+      }
+
+      .cart-header h2 {
+        font-size: 1.4rem;
+      }
+
+      /* أزرار الكمية أكبر للموبايل */
+      .qty-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+      }
+
+      .qty-num {
+        width: 36px;
+        font-size: .9rem;
+      }
+
+      /* Order Summary */
+      .order-summary {
+        padding: 1.5rem;
+      }
+
+      .summary-title {
+        font-size: 1.2rem;
+      }
+
+      /* Payment icons يتكدسوا */
+      .payment-icons {
+        flex-wrap: wrap;
+        gap: .4rem;
+      }
+
+      .payment-icon {
+        font-size: .65rem;
+      }
+
+      /* Checkout btn */
+      .checkout-btn {
+        padding: 1rem;
+        font-size: .95rem;
+      }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 420px) {
+      .cart-item {
+        grid-template-columns: 72px 1fr;
+      }
+
+      .cart-item-img {
+        width: 72px;
+        height: 86px;
       }
 
       .cart-item-right {
-        grid-column: 2;
+        flex-wrap: wrap;
+        gap: .4rem;
       }
     }
+
 
     .loader-inline {
       width: 14px;
@@ -479,7 +605,7 @@
           <div class="cart-item-img">
             <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100x120/f5e8e8/1a0e1a?text=Product'">
           </div>
-          <div>
+          <div class="cart-item-info">
             <div class="cart-item-brand">Yoka Store</div>
             <div class="cart-item-name">${item.name}</div>
             <div class="cart-item-meta">الكمية: ${item.quantity}</div>

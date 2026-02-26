@@ -1,520 +1,517 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <title>تسجيل الدخول</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#2c3e50" />
-    
-    <!-- PWA Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="فوكس بيزنيس" />
-    <meta name="application-name" content="فوكس بيزنيس" />
-    <meta name="description" content="نظام متقدم لإدارة التحصيل والمتابعة العملاء" />
-    <meta name="msapplication-TileColor" content="#2c3e50" />
-    <meta name="msapplication-config" content="./browserconfig.xml" />
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="./manifest.json" />
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="./Orange_logo.svg.png" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="./Orange_logo.svg.png" />
-    
-    <!-- Modern CSS Framework -->
-    <link rel="stylesheet" href="./modern-styles.css">
-    
-    <style>
-      /* Login Page Specific Styles */
-      .login-page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .login-page::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.02)"/><circle cx="10" cy="50" r="0.5" fill="rgba(255,255,255,0.02)"/><circle cx="90" cy="30" r="0.5" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        pointer-events: none;
-      }
-      
-      .login-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1);
-        padding: 3rem;
-        width: 100%;
-        max-width: 420px;
-        position: relative;
-        z-index: 1;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-      
-      .login-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-      }
-      
-      .login-logo {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 1.5rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 24px rgba(44, 62, 80, 0.2);
-      }
-      
-      .login-logo img {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-      }
-      
-      .login-title {
-        font-size: var(--font-size-3xl);
-        font-weight: 700;
-        color: var(--dark-color);
-        margin-bottom: 0.5rem;
-      }
-      
-      .login-subtitle {
-        color: var(--gray-600);
-        font-size: var(--font-size-base);
-        margin-bottom: 0;
-      }
-      
-      .login-form {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-      }
-      
-      .input-group {
-        position: relative;
-      }
-      
-      .input-icon {
-        position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--gray-500);
-        font-size: var(--font-size-lg);
-        pointer-events: none;
-        transition: var(--transition);
-      }
-      
-      .form-control:focus + .input-icon {
-        color: var(--primary-color);
-      }
-      
-      .form-control {
-        padding-right: 3rem;
-        font-size: var(--font-size-base);
-        border: 2px solid var(--gray-200);
-        background: var(--white);
-      }
-      
-      .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px rgba(44, 62, 80, 0.1);
-      }
-      
-      .login-btn {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: var(--white);
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: var(--border-radius);
-        font-size: var(--font-size-lg);
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        position: relative;
-        overflow: hidden;
-        min-height: 52px;
-      }
-      
-      .login-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(44, 62, 80, 0.3);
-      }
-      
-      .login-btn:active {
-        transform: translateY(0);
-      }
-      
-      .login-btn.loading {
-        color: transparent;
-        pointer-events: none;
-      }
-      
-      .login-btn.loading::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: var(--white);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      
-      .login-links {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--gray-200);
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-      
-      .login-link {
-        color: var(--primary-color);
-        text-decoration: none;
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-        transition: var(--transition);
-      }
-      
-      .login-link:hover {
-        color: var(--secondary-color);
-        text-decoration: underline;
-      }
-      
-      .alert {
-        border-radius: var(--border-radius);
-        padding: 1rem 1.25rem;
-        font-size: var(--font-size-sm);
-        border: 1px solid transparent;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
-        animation: fadeIn 0.3s ease-out;
-      }
-      
-      .alert-error {
-        background: linear-gradient(135deg, #fee2e2, #fecaca);
-        color: #991b1b;
-        border-color: #fca5a5;
-      }
-      
-      .alert-success {
-        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-        color: #166534;
-        border-color: #86efac;
-      }
-      
-      .remember-forgot {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-      
-      .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      
-      .checkbox-group input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--primary-color);
-      }
-      
-      .checkbox-group label {
-        font-size: var(--font-size-sm);
-        color: var(--gray-600);
-        cursor: pointer;
-      }
-      
-      /* Responsive Design */
-      @media (max-width: 576px) {
-        .login-container {
-          margin: 1rem;
-          padding: 2rem;
-        }
-        
-        .login-title {
-          font-size: var(--font-size-2xl);
-        }
-        
-        .login-links {
-          flex-direction: column;
-          align-items: stretch;
-          text-align: center;
-        }
-      }
-      
-      /* Animation */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      
-      @keyframes spin {
-        to {
-          transform: translate(-50%, -50%) rotate(360deg);
-        }
-      }
-    </style>
 
-    <script type="module">
-      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yoka Store | متجر يوكا</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Client Configuration -->
+  <script src="supabase-client.js"></script>
+</head>
 
-      const supabase = createClient(
-        "https://inguuoiolmbplubkwcvd.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImluZ3V1b2lvbG1icGx1Ymt3Y3ZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDIxMjksImV4cCI6MjA4NjA3ODEyOX0.wRTnc2LRoy4d77K7RWOeglfsO51kCfN3NlRB7UvyD4Y"
-      );
+<body>
 
-      window.login = async function () {
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const alertBox = document.getElementById("alertBox");
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
 
-        alertBox.style.display = "none";
-        alertBox.className = "alert";
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <span class="loader-brand">Y</span>
+      <div class="loader-bar"></div>
+    </div>
+  </div>
 
-        if (!email || !password) {
-          showAlert("يرجى إدخال البريد الإلكتروني وكلمة المرور.", "error");
-          return;
-        }
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-left">
+      <button class="nav-menu-btn" id="menuBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="shop.html">المتجر</a></li>
+        <li><a href="makeup.html">ميك أب</a></li>
+        <li><a href="fashion.html">أزياء</a></li>
+        <li><a href="collections.html">المجموعات</a></li>
+      </ul>
+    </div>
 
-        // Show loading state
-        const loginBtn = document.getElementById('loginBtn');
-        loginBtn.classList.add('loading');
-        loginBtn.disabled = true;
+    <a href="index.html" class="nav-logo">
+      <span class="logo-y">Y</span>oka
+    </a>
 
-        try {
-          // البحث عن المستخدم في جدول agents
-          const { data: agentData, error: agentError } = await supabase
-            .from("agents")
-            .select("*")
-            .eq("email", email.toLowerCase())
-            .maybeSingle();
+    <div class="nav-right">
+      <button class="nav-icon" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg></button>
+      <button class="nav-icon" aria-label="Wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg></button>
+      <a href="cart.html" class="nav-icon cart-icon" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+        <span class="cart-badge">0</span>
+      </a>
+    </div>
+  </nav>
 
-          if (agentError) {
-            console.error("Database error:", agentError);
-            showAlert("حدث خطأ في قاعدة البيانات.", "error");
-            return;
-          }
-
-          if (!agentData) {
-            showAlert("البريد الإلكتروني غير مسجل.", "error");
-            return;
-          }
-
-          // التحقق من كلمة المرور (في الإنتاج يجب استخدام تشفير)
-          if (agentData.password !== password) {
-            showAlert("كلمة المرور غير صحيحة.", "error");
-            return;
-          }
-
-          // حفظ بيانات المندوب في localStorage
-          localStorage.setItem("agent_id", agentData.id);
-          localStorage.setItem("agent_name", agentData.name);
-          localStorage.setItem("agent_email", agentData.email);
-          localStorage.setItem("role", agentData.role);
-          
-          // Save remember me preference
-          const rememberCheckbox = document.getElementById('remember');
-          if (rememberCheckbox.checked) {
-            localStorage.setItem('remember_email', email);
-          } else {
-            localStorage.removeItem('remember_email');
-          }
-
-          // تحديث آخر تسجيل دخول
-          await supabase
-            .from("agents")
-            .update({ updated_at: new Date().toISOString() })
-            .eq("id", agentData.id);
-
-          // تسجيل دخول في جدول login_logs
-          await supabase.from("login_logs").insert([{ agent_id: agentData.id }]);
-
-          showAlert("تم تسجيل الدخول بنجاح. يتم التوجيه...", "success");
-
-          setTimeout(() => {
-            if (agentData.role === "admin") {
-              window.location.href = "admin-dashboard.html";
-            } else {
-              window.location.href = "collections.html";
-            }
-          }, 1500);
-
-        } catch (error) {
-          console.error("Login error:", error);
-          showAlert("حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.", "error");
-        } finally {
-          // Remove loading state
-          const loginBtn = document.getElementById('loginBtn');
-          loginBtn.classList.remove('loading');
-          loginBtn.disabled = false;
-        }
-      };
-
-      // Show alert helper function
-      window.showAlert = function(message, type = 'error') {
-        const alertBox = document.getElementById("alertBox");
-        alertBox.style.display = "block";
-        alertBox.className = type === 'error' ? 'alert alert-error' : 'alert alert-success';
-        const icon = type === 'error' ? '⚠️' : '✅';
-        alertBox.innerHTML = `<span>${icon}</span><span>${message}</span>`;
-        
-        if (type === 'success') {
-          setTimeout(() => {
-            alertBox.style.display = 'none';
-          }, 3000);
-        }
-      };
-
-      // Load remembered email on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        const rememberedEmail = localStorage.getItem('remember_email');
-        if (rememberedEmail) {
-          document.getElementById('email').value = rememberedEmail;
-          document.getElementById('remember').checked = true;
-        }
-      });
-      
-      // Service Worker Registration
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(error => {
-              console.log('ServiceWorker registration failed: ', error);
-            });
-        });
-      }
-
-      // PWA Install Prompt
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        
-        // Show install button or banner
-        const installButton = document.createElement('button');
-        installButton.textContent = 'ثبت التطبيق';
-        installButton.style.cssText = `
-          position: fixed;
-          bottom: 20px;
-          left: 20px;
-          background: #3498db;
-          color: white;
-          border: none;
-          padding: 12px 20px;
-          border-radius: 6px;
-          cursor: pointer;
-          z-index: 1000;
-          font-size: 14px;
-        `;
-        
-        installButton.addEventListener('click', () => {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('User accepted the A2HS prompt');
-            } else {
-              console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null;
-            installButton.remove();
-          });
-        });
-        
-        document.body.appendChild(installButton);
-      });
-    </script>
-  </head>
-
-  <body class="login-page">
-    <div class="login-container">
-      <div class="login-header">
-        <div class="login-logo">
-          <img src="./Orange_logo.svg.png" alt="فوكس بيزنيس">
-        </div>
-        <h1 class="login-title">فوكس بيزنيس</h1>
-        <p class="login-subtitle">نظام إدارة التحصيل المتقدم</p>
-      </div>
-      
-      <form class="login-form" onsubmit="return false;">
-        <div id="alertBox" class="alert" style="display: none;"></div>
-        
-        <div class="input-group">
-          <input 
-            type="email" 
-            id="email" 
-            class="form-control" 
-            placeholder="البريد الإلكتروني" 
-            autocomplete="username" 
-            required
-          >
-          <span class="input-icon">📧</span>
-        </div>
-        
-        <div class="input-group">
-          <input 
-            type="password" 
-            id="password" 
-            class="form-control" 
-            placeholder="كلمة المرور" 
-            autocomplete="current-password" 
-            required
-          >
-          <span class="input-icon">🔒</span>
-        </div>
-        
-        <div class="remember-forgot">
-          <div class="checkbox-group">
-            <input type="checkbox" id="remember">
-            <label for="remember">تذكرني</label>
-          </div>
-        </div>
-        
-        <button type="submit" class="login-btn" onclick="login()" id="loginBtn">
-          تسجيل الدخول
-        </button>
-      </form>
-      
-      <div class="login-links">
-        <a href="./forget-pass.html" class="login-link">نسيت كلمة المرور؟</a>
-        <a href="./register.html" class="login-link">إنشاء حساب جديد</a>
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-inner">
+      <button class="mobile-menu-close" id="menuClose">✕</button>
+      <nav class="mobile-nav">
+        <a href="shop.html" class="mobile-nav-link">المتجر</a>
+        <a href="makeup.html" class="mobile-nav-link">ميك أب</a>
+        <a href="fashion.html" class="mobile-nav-link">أزياء</a>
+        <a href="collections.html" class="mobile-nav-link">المجموعات</a>
+        <a href="about.html" class="mobile-nav-link">من نحن</a>
+        <a href="contact.html" class="mobile-nav-link">تواصلي معنا</a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <p>@yokastore</p>
       </div>
     </div>
-  </body>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-gradient"></div>
+      <div class="hero-pattern"></div>
+    </div>
+
+    <!-- Left: Content -->
+    <div class="hero-content">
+      <div class="hero-eyebrow" data-reveal>
+        <span class="hero-line-accent"></span>
+        <span class="hero-tag">New Collection 2025</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="hero-title-line">أنوثة</span>
+        <span class="hero-title-line italic">لا حدود</span>
+        <span class="hero-title-line">لها</span>
+      </h1>
+
+      <p class="hero-subtitle" data-reveal>
+        اكتشفي عالماً من الجمال والأناقة مع Yoka Store —<br />
+        أزياء راقية وميك أب فاخر لكل امرأة
+      </p>
+
+      <div class="hero-actions" data-reveal>
+        <a href="shop.html" class="btn-primary">
+          <span>تسوقي الآن</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a href="collections.html" class="btn-outline">استكشفي المجموعات</a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="hero-stats" data-reveal>
+        <div class="hero-stat">
+          <div class="hero-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+          </div>
+          <div class="hero-stat-info">
+            <span class="hero-stat-num">+٥٠٠</span>
+            <span class="hero-stat-label">منتج فاخر</span>
+          </div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+          <div class="hero-stat-info">
+            <span class="hero-stat-num">٤.٩ ★</span>
+            <span class="hero-stat-label">تقييم العملاء</span>
+          </div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="3" width="15" height="13" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+          </div>
+          <div class="hero-stat-info">
+            <span class="hero-stat-num">٢٤ ساعة</span>
+            <span class="hero-stat-label">توصيل سريع</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Visual -->
+    <div class="hero-visual">
+      <div class="hero-slider" id="heroSlider">
+        <!-- Slide 1: Beauty/Makeup -->
+        <div class="hero-slide active">
+          <img src="https://images.unsplash.com/photo-1596462502278-27bfdc4033c8?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Beauty" />
+        </div>
+        <!-- Slide 2: Fashion -->
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1539109132381-31a1ba974f82?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Fashion" />
+        </div>
+        <!-- Slide 3: Skincare -->
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Skin" />
+        </div>
+        <!-- Slide 4: Accessories -->
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1200&auto=format&fit=crop"
+            alt="Yoka Accessories" />
+        </div>
+
+        <div class="slider-dots" id="sliderDots">
+          <span class="dot active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
+          <span class="dot" data-index="3"></span>
+        </div>
+      </div>
+
+
+      <!-- Scroll hint -->
+      <div class="hero-scroll">
+        <span>مرري للأسفل</span>
+        <div class="scroll-line"></div>
+      </div>
+
+
+
+      <!-- Bottom Marquee -->
+      <div class="hero-marquee">
+        <div class="marquee-track">
+          <span>EXCLUSIVE COLLECTIONS · 2025 SUMMER ARRIVALS · LUXURY BEAUTY · PREMIUM FASHION · SKINCARE ESSENTIALS ·
+          </span>
+          <span>EXCLUSIVE COLLECTIONS · 2025 SUMMER ARRIVALS · LUXURY BEAUTY · PREMIUM FASHION · SKINCARE ESSENTIALS ·
+          </span>
+          <span>EXCLUSIVE COLLECTIONS · 2025 SUMMER ARRIVALS · LUXURY BEAUTY · PREMIUM FASHION · SKINCARE ESSENTIALS ·
+          </span>
+        </div>
+      </div>
+  </section>
+
+  <div class="hero-trust">
+    <span>✦ منتجات أصلية ١٠٠٪</span>
+    <span>✦ شحن سريع لكل المحافظات</span>
+    <span>✦ الدفع عند الاستلام</span>
+  </div>
+  </div>
+
+  <!-- Categories Section -->
+  <section class="categories section">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <span class="section-tag">تصفحي بالفئة</span>
+        <h2 class="section-title">اختاري<em> عالمك</em></h2>
+      </div>
+
+      <div class="categories-grid" id="categoriesGrid">
+        <div class="cat-card cat-makeup" data-reveal data-category-slug="makeup">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3557/3557605.png" alt="Makeup"
+                style="width:40px;"></div>
+            <h3>ميك أب</h3>
+            <p>أحمر شفاه · بودرة · عيون · بشرة</p>
+            <a href="makeup.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+
+        <div class="cat-card cat-fashion" data-reveal data-category-slug="fashion">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/3159/3159620.png" alt="Fashion"
+                style="width:40px;"></div>
+            <h3>أزياء</h3>
+            <p>فساتين · عبايات · إكسسوارات</p>
+            <a href="fashion.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+
+        <div class="cat-card cat-skincare" data-reveal data-category-slug="skincare">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1764/1764708.png" alt="Skincare"
+                style="width:40px;"></div>
+            <h3>العناية بالبشرة</h3>
+            <p>سيروم · مرطب · كريم · ماسك</p>
+            <a href="skincare.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+
+        <div class="cat-card cat-accessories" data-reveal data-category-slug="accessories">
+          <div class="cat-card-bg"></div>
+          <div class="cat-card-content">
+            <div class="cat-icon-img"><img src="https://cdn-icons-png.flaticon.com/512/1251/1251415.png"
+                alt="Accessories" style="width:40px;"></div>
+            <h3>إكسسوارات</h3>
+            <p>حقائب · مجوهرات · نظارات</p>
+            <a href="accessories.html" class="cat-link">تسوقي <span>→</span></a>
+          </div>
+          <div class="cat-card-items">
+            <span class="cat-count">+٠ منتج</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Collection -->
+  <section class="featured section">
+    <div class="container">
+      <div class="section-header centered" data-reveal>
+        <span class="section-tag">الأكثر مبيعاً</span>
+        <h2 class="section-title">منتجات <em>مميزة</em></h2>
+      </div>
+
+      <div class="products-filter" data-reveal>
+        <button class="filter-btn active" data-filter="all">الكل</button>
+        <button class="filter-btn" data-filter="makeup">ميك أب</button>
+        <button class="filter-btn" data-filter="fashion">أزياء</button>
+        <button class="filter-btn" data-filter="skincare">بشرة</button>
+        <button class="filter-btn" data-filter="new">جديد</button>
+      </div>
+
+      <div class="products-grid" id="productsGrid">
+        <!-- Product Cards injected by JS -->
+      </div>
+
+      <div class="view-all-wrap" data-reveal>
+        <a href="shop.html" class="btn-primary">عرض كل المنتجات</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Campaign Banner -->
+  <section class="campaign section">
+    <div class="campaign-inner">
+      <div class="campaign-text" data-reveal>
+        <span class="section-tag light">مجموعة الصيف ٢٠٢٥</span>
+        <h2 class="campaign-title">
+          صيف من<br /><em>الألوان</em>
+        </h2>
+        <p>أحمر شفاه جرئ · ظلال عيون نابضة · فساتين الصيف المميزة</p>
+        <a href="collections.html" class="btn-light">اكتشفي الآن</a>
+      </div>
+      <div class="campaign-shapes">
+        <div class="cs cs1"></div>
+        <div class="cs cs2"></div>
+        <div class="cs cs3"></div>
+        <div class="cs cs4"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials section">
+    <div class="container">
+      <div class="section-header centered" data-reveal>
+        <span class="section-tag">آراء عملاؤنا</span>
+        <h2 class="section-title">هن <em>تحبوننا</em></h2>
+      </div>
+
+      <div class="testimonials-track" id="testimonialsTrack">
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"من أجمل المتاجر اللي تعاملت معها! الجودة فوق التوقعات والشحن سريع جداً"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#f4b8c1"></div>
+            <span>سارة محمد</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"أحمر الشفاه من Yoka يدوم طول اليوم! ما عدت أجرب غيره"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#c8b4e3"></div>
+            <span>نورا الأحمدي</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"الفستان وصل وأنا ما توقعت يكون بهالجودة. الخامة راقية جداً"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#b4d8e3"></div>
+            <span>ليلى العمر</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="tcard-stars">★★★★★</div>
+          <p>"التغليف فخم جداً، حاسة إن كل طلب هدية! شكراً Yoka على الاهتمام"</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar" style="background:#e3c8b4"></div>
+            <span>رنا خالد</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonials-dots" id="tDots"></div>
+    </div>
+  </section>
+
+  <!-- Instagram / Social -->
+  <section class="social section">
+    <div class="container">
+      <div class="section-header centered" data-reveal>
+        <span class="section-tag">تابعينا</span>
+        <h2 class="section-title"><a href="#" id="social-section-link" target="_blank"
+            style="color: inherit; text-decoration: none;"><span id="social-section-handle">@yokastore</span> <em>على
+              انستقرام</em></a></h2>
+      </div>
+      <div class="social-grid" data-reveal>
+        <div class="social-item si1" id="social-item-1">
+          <div class="si-overlay"><span>♡ 2.4k</span></div>
+        </div>
+        <div class="social-item si2" id="social-item-2">
+          <div class="si-overlay"><span>♡ 1.8k</span></div>
+        </div>
+        <div class="social-item si3" id="social-item-3">
+          <div class="si-overlay"><span>♡ 3.1k</span></div>
+        </div>
+        <div class="social-item si4" id="social-item-4">
+          <div class="si-overlay"><span>♡ 980</span></div>
+        </div>
+        <div class="social-item si5" id="social-item-5">
+          <div class="si-overlay"><span>♡ 2.2k</span></div>
+        </div>
+        <div class="social-item si6" id="social-item-6">
+          <div class="si-overlay"><span>♡ 4.5k</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="newsletter section">
+    <div class="container">
+      <div class="newsletter-inner" data-reveal>
+        <div class="nl-deco nl-deco-1">✦</div>
+        <div class="nl-deco nl-deco-2">✦</div>
+        <span class="section-tag">النشرة البريدية</span>
+        <h2 class="newsletter-title">كوني أول من تعرف<br /><em>عن عروضنا</em></h2>
+        <p>اشتركي واحصلي على خصم ١٥٪ على أول طلب</p>
+        <form class="nl-form" onsubmit="handleNewsletter(event)">
+          <input type="email" placeholder="بريدك الإلكتروني" class="nl-input" required />
+          <button type="submit" class="nl-btn">اشتركي</button>
+        </form>
+        <p class="nl-note">لا رسائل مزعجة. يمكنك إلغاء الاشتراك في أي وقت.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span class="logo-y">Y</span>oka
+          </a>
+          <p>متجرك المفضل للجمال والأزياء الراقية.<br />جودة لا تُقبل بأقل منها.</p>
+          <div class="footer-socials">
+            <a href="#" class="social-link" id="footer-social-ig" target="_blank">Instagram</a>
+            <a href="#" class="social-link" id="footer-social-tt" target="_blank">TikTok</a>
+            <a href="#" class="social-link" id="footer-social-sc" target="_blank">Snapchat</a>
+          </div>
+        </div>
+
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>التسوق</h4>
+            <ul>
+              <li><a href="makeup.html">ميك أب</a></li>
+              <li><a href="fashion.html">أزياء</a></li>
+              <li><a href="skincare.html">العناية بالبشرة</a></li>
+              <li><a href="accessories.html">إكسسوارات</a></li>
+              <li><a href="sale.html">تخفيضات</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>خدمة العملاء</h4>
+            <ul>
+              <li><a href="shipping.html">الشحن والتوصيل</a></li>
+              <li><a href="returns.html">الإرجاع والاستبدال</a></li>
+              <li><a href="#">تتبع الطلب</a></li>
+              <li><a href="contact.html">تواصلي معنا</a></li>
+              <li><a href="#">الأسئلة الشائعة</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>يوكا</h4>
+            <ul>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="#">مدونتنا</a></li>
+              <li><a href="#">برنامج الولاء</a></li>
+              <li><a href="#">سياسة الخصوصية</a></li>
+              <li><a href="#">الشروط والأحكام</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© ٢٠٢٥ Yoka Store. جميع الحقوق محفوظة.</p>
+        <div class="footer-payments">
+          <span>Visa</span>
+          <span>Mastercard</span>
+          <span>Mada</span>
+          <span>Apple Pay</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Quick View Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="quickViewModal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <!-- Cart Manager must be loaded after main script -->
+  <script src="cart-manager.js"></script>
+</body>
+
 </html>

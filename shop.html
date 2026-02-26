@@ -333,17 +333,140 @@
       font-size: 1.1rem;
     }
 
+    /* Mobile Filter Toggle Button */
+    .mobile-filter-btn {
+      display: none;
+      align-items: center;
+      gap: .6rem;
+      padding: .65rem 1.4rem;
+      background: var(--noir);
+      color: var(--white);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition);
+      border: none;
+    }
+
+    .mobile-filter-btn:hover {
+      background: var(--rose-dark);
+    }
+
+    /* Sidebar Drawer Overlay (mobile) */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 11, 15, .55);
+      z-index: 800;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+
+    .sidebar-overlay.open {
+      opacity: 1;
+    }
+
+    .sidebar-close-btn {
+      display: none;
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      background: var(--cream-2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition);
+      font-family: inherit;
+    }
+
+    .sidebar-close-btn:hover {
+      background: var(--rose-light);
+    }
+
     @media (max-width: 768px) {
+
+      /* Mobile filter button */
+      .mobile-filter-btn {
+        display: flex;
+      }
+
+      /* Topbar row: count + filter btn */
+      .shop-topbar {
+        flex-wrap: wrap;
+        gap: .75rem;
+      }
+
+      .shop-sort {
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      /* Sidebar becomes drawer */
       .shop-layout {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
-        position: static;
+        position: fixed;
+        top: 0;
+        right: -320px;
+        width: 300px;
+        height: 100vh;
+        background: var(--cream);
+        z-index: 900;
+        padding: 5rem 1.75rem 2rem;
+        box-shadow: -8px 0 40px rgba(14, 11, 15, .18);
+        transition: right .4s cubic-bezier(.4, 0, .2, 1);
+        overflow-y: auto;
       }
 
+      .sidebar.sidebar-open {
+        right: 0;
+      }
+
+      .sidebar-overlay {
+        display: none;
+      }
+
+      .sidebar-close-btn {
+        display: flex;
+      }
+
+      /* Products grid */
       .shop-products-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      /* List view fix */
+      .shop-products-grid.view-list .product-card {
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .shop-products-grid {
+        gap: .75rem;
+      }
+
+      .shop-topbar {
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .view-toggle {
+        display: none;
       }
     }
   </style>
@@ -403,6 +526,9 @@
     </div>
   </div>
 
+  <!-- Sidebar Overlay (Mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
   <!-- Page Hero -->
   <section class="page-hero">
     <div class="page-hero-content">
@@ -428,7 +554,9 @@
     <div class="shop-layout">
 
       <!-- Sidebar -->
-      <aside class="sidebar">
+      <aside class="sidebar" id="shopSidebar">
+        <!-- Close button (mobile only) -->
+        <button class="sidebar-close-btn" onclick="closeSidebar()">✕</button>
         <!-- Categories -->
         <div class="sidebar-section">
           <h3 class="sidebar-title">الفئات</h3>
@@ -480,7 +608,17 @@
       <main>
         <!-- Top Bar -->
         <div class="shop-topbar">
-          <span class="shop-count" id="shopCount">جاري التحميل...</span>
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+            <span class="shop-count" id="shopCount">جاري التحميل...</span>
+            <button class="mobile-filter-btn" onclick="openSidebar()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="8" y1="12" x2="20" y2="12" />
+                <line x1="12" y1="18" x2="20" y2="18" />
+              </svg>
+              الفلاتر
+            </button>
+          </div>
           <div class="shop-sort">
             <span style="font-size:.82rem;color:var(--text-mid)">ترتيب:</span>
             <select class="sort-select" id="sortSelect">
@@ -531,6 +669,39 @@
   <script src="script.js"></script>
   <script src="cart-manager.js"></script>
   <script src="shop.js"></script>
+  <script>
+    /* ── Mobile Sidebar Drawer ── */
+    function openSidebar() {
+      const sidebar = document.getElementById('shopSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.add('sidebar-open');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('shopSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.remove('sidebar-open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on ESC key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
+
+    // Close sidebar when applying/clearing filters on mobile
+    const applyBtn = document.getElementById('applyFilters');
+    const clearBtn = document.getElementById('clearFilters');
+    if (applyBtn) applyBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  </script>
 </body>
 
 </html>

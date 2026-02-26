@@ -494,7 +494,7 @@ function renderProducts(products) {
         </a>
         ${p.badge ? `<span class="product-card-badge ${p.badgeType}">${p.badge}</span>` : ''}
         <div class="product-card-actions">
-          <button class="product-card-action-btn" onclick="openQuickView('${p.id}')">عرض سريع</button>
+          <button class="product-card-action-btn" onclick="openQuickView('${p.id}')">عرض المنتج</button>
           <button class="product-card-action-btn" onclick="addToCart('${p.id}')">أضف للسلة</button>
           <button class="product-card-action-btn wishlist-btn" onclick="addToWishlist('${p.id}')">♡</button>
         </div>
